@@ -395,14 +395,17 @@
 
             <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--border);">
                 <div class="nav-item" style="color:var(--success); border-color:var(--success); margin-bottom:10px;" onclick="runStressTest()">⚡ Run Neural Diagnostic</div>
-                <div class="nav-item" style="color:var(--error); opacity:0.8;" onclick="location.reload()">🚪 Exit to Site</div>
+                <div class="nav-item" style="color:var(--error); opacity:0.8;" onclick="window.location.href='/'">🚪 Exit to Site</div>
             </div>
         </div>
 
         <!-- MAIN -->
         <div class="main-content">
             <header>
-                <h1 style="font-size:20px;">Dashboard <span style="font-weight:400; color:var(--text-muted); font-size:14px; margin-left:10px;">/ AI Analysis Overview</span></h1>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <button class="nav-item" style="background:var(--card); border:1px solid var(--border); width:40px; height:40px; padding:0; justify-content:center; display:flex;" onclick="window.location.href='/'" title="Back to Home">🏠</button>
+                    <h1 style="font-size:20px;">Dashboard <span style="font-weight:400; color:var(--text-muted); font-size:14px; margin-left:10px;">/ AI Analysis Overview</span></h1>
+                </div>
                 <div class="profile-area">
                     <div id="neuralHealthIndicator" style="display:flex; align-items:center; gap:8px; background:rgba(0,255,136,0.1); padding:6px 12px; border-radius:20px; font-size:10px; font-weight:800; color:var(--success); border:1px solid rgba(0,255,136,0.2);">
                         <span style="width:6px; height:6px; background:var(--success); border-radius:50%; animation: pulse 1s infinite;"></span>
@@ -544,6 +547,10 @@
                         <div class="stat-card">
                             <div class="stat-label">Rotation (ms)</div>
                             <input id="cfgHeroDuration" placeholder="8000">
+                        </div>
+                        <div class="stat-card" style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="document.getElementById('cfgHeroAuto').click()">
+                            <input type="checkbox" id="cfgHeroAuto" style="width:20px; height:20px; margin:0;">
+                            <div class="stat-label" style="margin:0;">Enable Auto-Rotation</div>
                         </div>
                     </div>
                 </div>
@@ -757,6 +764,7 @@
             document.getElementById('cfgHeroHeight').value = cfg.heroHeight || "75vh";
             document.getElementById('cfgHeroScale').value = cfg.heroScale || "120%";
             document.getElementById('cfgHeroDuration').value = cfg.heroRotationDuration || "8000";
+            document.getElementById('cfgHeroAuto').checked = cfg.heroAutoRotation !== false;
         }
 
         async function saveConfig(btn) {
@@ -768,7 +776,8 @@
                 heroOverrideId: document.getElementById('cfgHeroId').value.trim(),
                 heroHeight: document.getElementById('cfgHeroHeight').value.trim() || "75vh",
                 heroScale: document.getElementById('cfgHeroScale').value.trim() || "120%",
-                heroRotationDuration: parseInt(document.getElementById('cfgHeroDuration').value) || 8000
+                heroRotationDuration: parseInt(document.getElementById('cfgHeroDuration').value) || 8000,
+                heroAutoRotation: document.getElementById('cfgHeroAuto').checked
             };
 
             try {

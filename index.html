@@ -1822,7 +1822,7 @@
         let heroInterval;
         let isAdmin = false;
         let authMode = 'login';
-        let appConfig = { heroRotationDuration: 8000 };
+        let appConfig = { heroRotationDuration: 8000, heroAutoRotation: true };
 
         async function init() {
             try {
@@ -1864,8 +1864,15 @@
                                 updateHero(overrideMovie);
                                 stopHeroRotation();
                             }, 500);
-                        } else {
+                        } else if (appConfig.heroAutoRotation) {
                             startHeroRotation();
+                        } else {
+                            // If auto-rotation is off, just show the first hero once
+                            setTimeout(() => {
+                                const trending = movies.filter(m => m.isHero === true);
+                                if (trending.length) updateHero(trending[0]);
+                                stopHeroRotation();
+                            }, 500);
                         }
                     }
             } catch (e) {
@@ -1886,8 +1893,8 @@
                 document.getElementById('profName').innerText = data.name;
                 document.getElementById('profEmail').innerText = data.email;
                 if (data.isAdmin) document.getElementById('adminLink').style.display = 'flex';
-                showPage('home');
-                startHeroRotation();
+            showPage('home');
+                if (appConfig.heroAutoRotation) startHeroRotation();
             }
 
             setTimeout(() => {
@@ -1902,6 +1909,7 @@
 
         function startHeroRotation() {
             stopHeroRotation(); // Clear any existing
+            if (!appConfig.heroAutoRotation) return; // Admin can disable auto-rotation
             
             const scheduleNext = () => {
                 const trending = movies.filter(m => m.isHero === true);
