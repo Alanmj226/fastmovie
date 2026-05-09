@@ -1,0 +1,17 @@
+{
+    "jalan6853@gmail.com": {
+        "name": "Alan",
+        "email": "jalan6853@gmail.com",
+        "password": "alan@123",
+        "favorites": [],
+        "continueWatch": [],
+        "isLoggedIn": true,
+        "reviews": [
+            {
+                "movieId": 4,
+                "text": "haii",
+                "time": "2026-05-08 01:14"
+            }
+        ]
+    }
+}

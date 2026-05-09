@@ -1,0 +1,2730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Movie - Premium Streaming</title>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #04070d;
+            --surface: #0a1120;
+            --surface-glass: rgba(10, 17, 32, 0.7);
+            --card: #111a2f;
+            --accent: #007aff;
+            --accent-gradient: linear-gradient(135deg, #007aff, #00c6ff);
+            --accent-glow: rgba(0, 122, 255, 0.5);
+            --text: #f5f5f7;
+            --text-muted: #86868b;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.6);
+            --trans: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* PREMIUM SCROLLBAR - HIDDEN BUT SCROLLABLE */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* AUTH / LOGIN - CENTERED CINEMATIC THEATER */
+        #loginPage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #020617;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* CINEMATIC STAGE (BACKGROUND) */
+        .cinema-stage {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .cinema-stage::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/black-linen.png');
+            opacity: 0.1;
+        }
+
+        /* PROJECTOR BEAM (CENTERED) */
+        .projector-beam {
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            width: 1000px;
+            height: 1000px;
+            background: conic-gradient(from 150deg at 50% 0%, rgba(59, 130, 246, 0.1) 0deg, transparent 60deg);
+            transform: translateX(-50%);
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 5;
+            animation: flicker 4s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.3; transform: translateX(-50%) scale(1.05); }
+        }
+
+        /* FLOATING MOVIE TILES */
+        .floating-tile {
+            position: absolute;
+            width: 120px;
+            height: 180px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: tile-float 25s infinite linear;
+            z-index: 2;
+        }
+
+        @keyframes tile-float {
+            from { transform: translate(var(--x, 0), 100vh) rotate(0deg); }
+            to { transform: translate(var(--x, 0), -300px) rotate(360deg); }
+        }
+
+        /* AUTH PANEL (CENTERED) */
+        .auth-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(80px) saturate(200%);
+            padding: 25px 30px;
+            border-radius: 32px;
+            width: 380px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            z-index: 10;
+            position: relative;
+            animation: neural-entrance 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .login-box {
+            width: 100%;
+            text-align: center;
+        }
+
+        @keyframes neural-entrance {
+            from { opacity: 0; transform: scale(0.9) translateY(40px); filter: blur(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        @keyframes neural-entrance {
+            from { opacity: 0; transform: scale(0.9) translateY(40px); filter: blur(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        .auth-toggle {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .auth-toggle span {
+            flex: 1;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: var(--trans);
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .auth-toggle span.active {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 8px 20px var(--accent-glow);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .pass-container {
+            position: relative;
+            display: none;
+        }
+
+        .toggle-eye {
+            position: absolute;
+            right: 15px;
+            top: 14px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-otp {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            margin-bottom: 15px;
+            box-shadow: none;
+        }
+
+        /* APP LAYOUT */
+        #app {
+            display: none;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 65px; height: calc(100vh - 40px);
+            top: 20px; left: 20px;
+            background: rgba(4, 7, 13, 0.8);
+            backdrop-filter: blur(40px);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 25px 0; border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            z-index: 1000; transition: var(--trans);
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .sidebar:hover { width: 70px; background: rgba(4, 7, 13, 0.95); }
+
+        .nav-item {
+            margin-bottom: 12px; cursor: pointer; opacity: 1; transition: var(--trans);
+            font-size: 24px; position: relative; display: flex; justify-content: center;
+            align-items: center; width: 45px; height: 45px; border-radius: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-item:hover { color: #fff; background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+        .nav-item.active { color: #fff; background: var(--accent-gradient); box-shadow: 0 8px 20px var(--accent-glow); opacity: 1; }
+
+        .nav-icon {
+            width: 26px; height: 26px; fill: currentColor; transition: var(--trans);
+        }
+
+        .nav-item:hover .nav-icon { filter: drop-shadow(0 0 8px var(--accent)); }
+
+        .nav-item span { display: none; } /* ONLY LOGOS ALLOWED */
+
+        .sidebar-logo {
+            margin-bottom: 40px; display: flex; justify-content: center; width: 100%;
+        }
+
+        .sidebar-logo img { width: 40px; height: 40px; border-radius: 10px; }
+
+        .sidebar:hover .sidebar-logo span {
+            opacity: 1;
+        }
+
+        .main-content {
+            margin-left: 95px;
+            padding-bottom: 100px;
+        }
+
+        /* HEADER */
+        header {
+            position: sticky;
+            top: 0;
+            padding: 20px 50px;
+            background: rgba(11, 15, 26, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 90;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-bar {
+            width: 400px;
+            position: relative;
+        }
+
+        .search-bar input {
+            margin-bottom: 0;
+            padding: 10px 40px;
+            border-radius: 20px;
+        }
+
+        .search-bar::before {
+            content: '🔍';
+            position: absolute;
+            left: 15px;
+            top: 10px;
+            opacity: 0.5;
+        }
+
+        /* HERO SECTION - HOTSTAR PREMIUM UPGRADE */
+        .hero {
+            position: relative;
+            height: 85vh;
+            overflow: hidden;
+            margin: 0; 
+            background: #000;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 120%; height: 120%; 
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0.85;
+            filter: brightness(0.7) saturate(1.1);
+            z-index: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, #0b0f1a 8%, transparent 50%),
+                        linear-gradient(to top, #0b0f1a 0%, transparent 25%);
+            z-index: 2;
+        }
+
+        .hero-info {
+            position: absolute;
+            bottom: 120px;
+            left: 60px;
+            z-index: 5;
+            max-width: 500px;
+            transition: all 0.5s ease;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .hero-dots {
+            position: absolute;
+            bottom: 40px;
+            left: 60px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 10px; height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .dot.active {
+            width: 30px;
+            background: var(--accent);
+            border-radius: 5px;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .mute-btn {
+            position: absolute;
+            bottom: 40px;
+            right: 60px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            transition: 0.3s;
+        }
+        .mute-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+
+        .hero-btns {
+            display: flex;
+            gap: 15px;
+        }
+
+        .category-row {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .category-row.hero-row {
+            height: 75vh;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* MOVIE ROWS */
+        .row {
+            padding: 40px 0 0 50px;
+        }
+
+        .row-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .row-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding-bottom: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .row-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* MOVIE CARD - LUXURY VERSION */
+        .movie-card {
+            min-width: 220px;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--trans);
+            cursor: pointer;
+            background: var(--card);
+            border: 1px solid var(--glass-border);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            z-index: 100;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            border-color: var(--accent);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            transition: var(--trans);
+        }
+
+        .movie-card:hover img {
+            transform: scale(1.1);
+            filter: brightness(0.6);
+        }
+
+        .movie-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 25px 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.8) 50%, transparent 100%);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--trans);
+        }
+
+        .movie-card:hover .movie-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .movie-name {
+            font-weight: 800;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .movie-meta {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* LANGUAGE FILTER */
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
+            padding: 20px 50px;
+            overflow-x: auto;
+        }
+
+        .tab-item {
+            padding: 8px 20px;
+            background: var(--glass);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid var(--glass-border);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .tab-item:hover,
+        .tab-item.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* WATCH PAGE */
+        .watch-page {
+            display: none;
+            padding: 20px 50px;
+            background: var(--bg);
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .player-wrap {
+            width: 100%;
+            height: 80vh;
+            background: black;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .back-btn {
+            padding: 12px 25px;
+            background: var(--surface);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: var(--accent);
+        }
+
+        /* FAB REMOVED - AI MOVED TO SIDEBAR */
+
+        /* AI NEURAL FAB */
+        .ai-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: radial-gradient(circle at 30% 30%, #3b82f6, #1e3a8a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            animation: ai-pulse 4s infinite ease-in-out;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-fab::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            animation: ripple 2s infinite;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        @keyframes ai-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+            50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(59, 130, 246, 0.7); }
+        }
+
+        .chat-box {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(40px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            animation: slideUp 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .chat-header {
+            background: linear-gradient(to right, #7c3aed, #1f80e0);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .msg {
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            font-size: 14px;
+        }
+
+        .msg.bot {
+            background: rgba(255, 255, 255, 0.05);
+            align-self: flex-start;
+        }
+
+        .msg.user {
+            background: var(--accent);
+            align-self: flex-end;
+        }
+
+        .chat-input {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input input {
+            margin-bottom: 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        #authError {
+            color: #ff4d4d;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .badge {
+            background: var(--accent);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        /* PROFILE PAGE */
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: var(--surface);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            border: 4px solid var(--glass-border);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .settings-list {
+            margin-top: 30px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .settings-item:hover {
+            color: var(--accent);
+        }
+
+        /* CINEMA ARCHITECTURE STYLES */
+        #watchPage {
+            position: relative;
+            min-height: 100vh;
+            background: #04070d;
+        }
+
+        .watch-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(100px) brightness(0.2);
+            opacity: 0.8;
+            z-index: 0;
+            transition: background-image 1.5s ease;
+        }
+
+        .watch-content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        .watch-container {
+            display: flex;
+            gap: 50px;
+            padding: 0 60px 100px 60px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .watch-main {
+            flex: 1;
+        }
+
+        .player-cinematic {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .watch-sidebar {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .watch-action-bar {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .watch-btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .watch-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 1300px) {
+            .watch-container {
+                flex-direction: column;
+                padding: 0 20px 100px 20px;
+            }
+            .watch-sidebar {
+                width: 100%;
+                position: static;
+            }
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 30px var(--accent-glow); }
+            50% { transform: scale(1.05); box-shadow: 0 0 60px var(--accent-glow); }
+            100% { transform: scale(1); box-shadow: 0 0 30px var(--accent-glow); }
+        }
+        /* NEURAL ENGINE OVERLAY */
+        #neuralOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(15px); z-index: 9999; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .neural-scan {
+            width: 300px; height: 2px; background: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+            animation: scanning 2s infinite ease-in-out;
+        }
+        @keyframes scanning {
+            0%, 100% { transform: translateY(-50px); opacity: 0; }
+            50% { transform: translateY(50px); opacity: 1; }
+        }
+        .neural-text {
+            margin-top: 30px; font-weight: 800; letter-spacing: 2px;
+            color: var(--accent); animation: pulse 1.5s infinite;
+        }
+
+        #chatBox {
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .match-badge {
+            position: absolute; top: 15px; left: 15px;
+            background: var(--accent); color: white;
+            padding: 4px 10px; border-radius: 8px; font-size: 10px;
+            font-weight: 800; z-index: 10;
+            box-shadow: 0 0 15px var(--accent-glow);
+            animation: pulse 2s infinite;
+        }
+
+        /* PREMIUM SPLASH ANIMATIONS */
+        @keyframes neural-aura {
+            0% { transform: scale(0.9); opacity: 0.3; box-shadow: 0 0 40px var(--accent-glow); }
+            50% { transform: scale(1.1); opacity: 0.6; box-shadow: 0 0 100px var(--accent-glow); }
+            100% { transform: scale(0.9); opacity: 0.3; box-shadow: 0 0 40px var(--accent-glow); }
+        }
+
+        @keyframes letter-spread {
+            0% { letter-spacing: 2px; opacity: 0.5; }
+            100% { letter-spacing: 8px; opacity: 1; }
+        }
+
+        @keyframes shimmer-logo {
+            0% { filter: brightness(1) drop-shadow(0 0 0px var(--accent)); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 20px var(--accent)); }
+            100% { filter: brightness(1) drop-shadow(0 0 0px var(--accent)); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL AI SPLASH SCREEN - REDESIGNED -->
+    <div id="splashScreen" style="position:fixed; inset:0; background:radial-gradient(circle at center, #0a1120 0%, #04070d 100%); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: all 1s cubic-bezier(0.4, 0, 0.2, 1); pointer-events:auto;">
+        
+        <div style="position:relative; margin-bottom:50px;">
+            <!-- NEURAL AURA EFFECT -->
+            <div style="position:absolute; inset:-40px; background:var(--accent-gradient); border-radius:50%; filter:blur(40px); animation: neural-aura 3s infinite ease-in-out; opacity:0.3;"></div>
+            
+            <!-- CINEMATIC LOGO -->
+            <div style="position:relative; width:120px; height:120px; background:rgba(255,255,255,0.03); backdrop-filter:blur(20px); border-radius:35px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.1); box-shadow:0 30px 60px rgba(0,0,0,0.5); animation: shimmer-logo 4s infinite ease-in-out;">
+                <img src="/logo.png" style="width:70px; height:70px; object-fit:contain;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/705/705062.png'">
+            </div>
+        </div>
+
+        <div style="text-align:center;">
+            <h1 style="font-size:32px; font-weight:900; color:white; margin:0; animation: letter-spread 3s infinite alternate cubic-bezier(0.445, 0.05, 0.55, 0.95); text-shadow: 0 0 20px rgba(255,255,255,0.2);">FAST MOVIE</h1>
+            <div style="margin-top:10px; font-size:8px; color:var(--accent); font-weight:900; letter-spacing:4px; text-transform:uppercase; opacity:0.8;">Neural Intelligence Engine 4.0</div>
+        </div>
+
+        <!-- MINIMALIST PROGRESS -->
+        <div style="margin-top:50px; width:180px; height:2px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden; position:relative;">
+            <div style="position:absolute; top:0; left:0; height:100%; width:50px; background:var(--accent-gradient); box-shadow:0 0 15px var(--accent); animation: loading-bar 2s infinite ease-in-out;"></div>
+        </div>
+        
+        <style>
+            @keyframes loading-bar {
+                0% { left: -50px; width: 30px; }
+                50% { width: 100px; }
+                100% { left: 180px; width: 30px; }
+            }
+        </style>
+
+        <div style="position:absolute; bottom:50px; text-align:center;">
+            <div style="font-size:9px; color:rgba(255,255,255,0.15); letter-spacing:3px; text-transform:uppercase; font-weight:700;">Discovering Your Cinematic Future</div>
+            <div style="margin-top:8px; display:flex; gap:8px; justify-content:center;">
+                <div style="width:3px; height:3px; background:var(--accent); border-radius:50%; opacity:0.3; animation: pulse 1s infinite;"></div>
+                <div style="width:3px; height:3px; background:var(--accent); border-radius:50%; opacity:0.3; animation: pulse 1s infinite 0.3s;"></div>
+                <div style="width:3px; height:3px; background:var(--accent); border-radius:50%; opacity:0.3; animation: pulse 1s infinite 0.6s;"></div>
+            </div>
+        </div>
+        <script>
+            // Safety Timeout: Hide splash after 5 seconds even if init fails
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                if (splash && splash.style.display !== 'none') {
+                    console.warn("Neural Link Safety Triggered: Forcing Splash Hide.");
+                    splash.style.pointerEvents = 'none';
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 1000);
+                }
+            }, 5000);
+        </script>
+    </div>
+
+    <!-- LOGIN SECTION -->
+    <div id="loginPage">
+        <!-- CINEMATIC BACKGROUND -->
+        <div class="cinema-stage">
+            <div class="projector-beam"></div>
+            
+            <!-- FLOATING MOVIE TILES -->
+            <div class="floating-tile" style="top:10%; --x:10vw; animation-delay: 0s;"></div>
+            <div class="floating-tile" style="top:40%; --x:80vw; animation-delay: -5s; width:180px; height:270px;"></div>
+            <div class="floating-tile" style="top:70%; --x:15vw; animation-delay: -10s;"></div>
+            <div class="floating-tile" style="top:20%; --x:75vw; animation-delay: -15s; width:100px; height:150px;"></div>
+        </div>
+
+        <!-- CENTERED AUTH PANEL -->
+        <div class="auth-panel">
+            <div class="login-box">
+                <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:15px;">
+                    <img src="/logo.png" style="width: 50px; height: 50px; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 10px 20px var(--accent-glow); border: 1px solid rgba(255,255,255,0.1);" onerror="this.src='https://cdn-icons-png.flaticon.com/512/705/705062.png'">
+                    <h2 style="margin:0; font-size:22px; letter-spacing:1px;">Fast Movie</h2>
+                    <div style="font-size:7px; color:var(--accent); font-weight:900; text-transform:uppercase; letter-spacing:3px; margin-top:2px;">Premium Cinematic Experience</div>
+                </div>
+            <div class="auth-toggle" style="margin-bottom: 15px; padding: 4px;">
+                <span id="tabLogin" class="active" onclick="setMode('login')" style="padding: 6px;">Sign In</span>
+                <span id="tabRegister" onclick="setMode('register')" style="padding: 6px;">Register</span>
+            </div>
+
+            <div id="qrSection" style="display:none; text-align:center; padding:20px;">
+                <div style="background:white; padding:15px; border-radius:15px; display:inline-block; margin-bottom:15px;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://fastmovie.com/login?token=DEMO_TOKEN" style="width:150px; height:150px;">
+                </div>
+                <p style="font-size:12px; color:var(--text-muted);">Scan to login instantly on this device</p>
+                <button class="btn-primary" style="margin-top:15px; background:rgba(255,255,255,0.1);" onclick="toggleQR()">Back to Password</button>
+            </div>
+
+            <div id="authFields">
+                <div id="nameGroup" style="display:none;">
+                    <input id="userName" placeholder="Full Name">
+                </div>
+                
+                <input id="userEmail" placeholder="Email Address" type="email" oninput="checkAdminAuto()">
+
+                <div id="passBox" class="pass-container" style="display:block;">
+                    <input id="userPass" type="password" placeholder="Enter Your Password">
+                    <span class="toggle-eye" onclick="togglePass('userPass', this)">👁️</span>
+                </div>
+                <p id="forgotLink" style="font-size:12px; color:var(--text-muted); cursor:pointer; text-align:right; margin-bottom:20px; margin-top:-5px;" onclick="setMode('forgot')">Forgot Password?</p>
+
+                <div id="otpBox" style="display:none;">
+                    <input id="otpInput" placeholder="Enter 6-digit OTP">
+                </div>
+
+                <button id="otpBtn" class="btn-primary btn-otp" style="display:none;" onclick="handleSendOTP()">Send OTP</button>
+                <button id="authBtn" class="btn-primary" onclick="handleAuth()">Sign In</button>
+                
+                <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
+                    <p style="font-size:12px; color:var(--text-muted); cursor:pointer;" onclick="toggleQR()">✨ Login with QR Code</p>
+                </div>
+            </div>
+            
+            <p id="authError"></p>
+        </div>
+    </div>
+    
+    <!-- FIXED FOOTER AT BOTTOM -->
+    <div style="position:absolute; bottom:30px; left:0; width:100%; text-align:center; z-index:10; pointer-events:none;">
+        <p style="font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:3px; text-transform:uppercase; font-weight:800;">
+            Unlimited Movies • Premium Quality • Instant Access
+        </p>
+    </div>
+</div>
+
+    <!-- MAIN APP SECTION -->
+    <div id="app">
+        <div id="neuralOverlay">
+            <div class="neural-scan"></div>
+            <div class="neural-text">ESTABLISHING NEURAL LINK...</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">Fast AI is analyzing your cinematic metadata</div>
+        </div>
+
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/logo.png" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/705/705062.png'">
+            </div>
+            <div class="nav-item active" onclick="showPage('home')" title="Home">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /></svg>
+            </div>
+            <div class="nav-item" onclick="showSearch()" title="Search">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /></svg>
+            </div>
+            <div class="nav-item" onclick="showPage('tv')" title="TV Shows">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" /></svg>
+            </div>
+            <div class="nav-item" onclick="showPage('sports')" title="Sports">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" /></svg>
+            </div>
+            <div class="nav-item" onclick="showPage('categories')" title="Categories">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" /></svg>
+            </div>
+            <div class="nav-item" onclick="toggleChat()" title="Fast AI Assistant">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10zM12 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-3 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" /></svg>
+            </div>
+
+            <div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 15px; padding-bottom: 20px; width: 100%;">
+                <div id="adminLink" class="nav-item" style="display:none;" onclick="location.href='/admin'" title="Admin Dashboard">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                </div>
+                <div class="nav-item" onclick="showPage('profile')" title="Settings">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l-1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                </div>
+                <div class="nav-item" onclick="doLogout()" title="Logout">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" /></svg>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <header>
+                <div style="font-size: 24px; font-weight: 800; letter-spacing: -1px; color: var(--text);">
+                    FAST <span style="color:var(--accent);">MOVIE</span>
+                </div>
+                
+                <div id="userGreeting" style="font-size: 14px; opacity: 0.6; display: flex; align-items: center; gap: 10px;">
+                    Welcome back, User
+                    <div style="width:35px; height:35px; background:var(--accent-gradient); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; border:1px solid rgba(255,255,255,0.2);">A</div>
+                </div>
+            </header>
+
+            <div id="homePage" class="page" style="display:none;">
+                <!-- AI SECTION -->
+                <div class="category-row">
+                    <div class="row-header">
+                        <h2 class="row-title">🤖 AI Recommendations For You</h2>
+                        <span class="row-more">Personalized</span>
+                    </div>
+                    <div id="aiRecRow" class="row-container"></div>
+                </div>
+
+                <div class="category-row hero-row">
+                    <iframe id="heroVideo" class="hero-video" src="" frameborder="0" 
+                        allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen></iframe>
+                    <div class="hero-overlay"></div>
+                    <div class="hero-info">
+                        <div class="hero-badge" id="heroBadge">✨ Trending Now</div>
+                        <h1 class="hero-title" id="heroTitle">Spider-Verse</h1>
+                        <p class="hero-desc" id="heroDesc">Miles Morales catapults across the Multiverse...</p>
+                        <div class="hero-btns">
+                            <button class="btn-primary" style="width:160px; border-radius:12px; font-weight:800;" id="heroPlayBtn">▶ WATCH NOW</button>
+                            <button class="btn-primary"
+                                style="width:160px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius:12px; backdrop-filter: blur(10px);"
+                                id="heroListBtn">+ MY LIST</button>
+                        </div>
+                    </div>
+                    <div class="hero-dots" id="heroDots"></div>
+                    <button class="mute-btn" id="heroMuteBtn" onclick="toggleHeroMute()">🔇</button>
+                </div>
+
+                <div id="continueWatchingRow" style="display:none;">
+                    <div class="row">
+                        <div class="row-title">🕒 Continue Watching <span class="badge"
+                                style="background:#ff4d4d;">Recent</span></div>
+                        <div class="row-container" id="continueWatchingContainer"></div>
+                    </div>
+                </div>
+
+                <div class="nav-tabs">
+                    <div class="tab-item active" onclick="filterLang('All', this)">All</div>
+                    <div class="tab-item" onclick="filterLang('English', this)">English</div>
+                    <div class="tab-item" onclick="filterLang('Hindi', this)">Hindi</div>
+                    <div class="tab-item" onclick="filterLang('Telugu', this)">Telugu</div>
+                    <div class="tab-item" onclick="filterLang('Tamil', this)">Tamil</div>
+                    <div class="tab-item" onclick="filterLang('Malayalam', this)">Malayalam</div>
+                    <div class="tab-item" onclick="filterLang('Japanese', this)">Japanese</div>
+                    <div class="tab-item" onclick="filterLang('Korean', this)">Korean</div>
+                    <div class="tab-item" onclick="filterLang('Spanish', this)">Spanish</div>
+                    <div class="tab-item" onclick="filterLang('French', this)">French</div>
+                    <div class="tab-item" onclick="filterLang('German', this)">German</div>
+                </div>
+
+                <div id="aiRow" style="display:none;">
+                    <div class="row">
+                        <div class="row-title">🤖 AI Recommended For You <span class="badge"
+                                style="background:linear-gradient(to right, #7c3aed, #1f80e0);">Smart</span></div>
+                        <div class="row-container" id="aiContainer"></div>
+                    </div>
+                </div>
+
+                <div id="movieRows">
+                    <!-- Dynamic rows will be injected here -->
+                </div>
+            </div>
+
+            <!-- TV PAGE -->
+            <div id="tvPage" class="page" style="display:none;">
+                <div style="padding: 40px 50px;">
+                    <h1 style="font-size:32px; margin-bottom:30px;">Premium TV Shows</h1>
+                    <div id="tvRows"></div>
+                </div>
+            </div>
+
+            <!-- SPORTS PAGE -->
+            <div id="sportsPage" class="page" style="display:none;">
+                <div style="padding: 40px 50px;">
+                    <h1 style="font-size:32px; margin-bottom:30px;">Live & Highlights</h1>
+                    <div id="sportsRows"></div>
+                </div>
+            </div>
+
+            <!-- CATEGORIES PAGE -->
+            <div id="categoriesPage" class="page" style="display:none;">
+                <div style="padding: 40px 50px;">
+                    <h1 style="font-size:32px; margin-bottom:30px;">Browse by Category</h1>
+                    <div class="row-container"
+                        style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:20px;">
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Action')">🔥 Action</div>
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Drama')">🎭 Drama</div>
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Comedy')">😂 Comedy</div>
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Horror')">👻 Horror</div>
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Sci-Fi')">🚀 Sci-Fi</div>
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Anime')">🎌 Anime</div>
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Cricket')">🏏 Cricket</div>
+                        <div class="tab-item"
+                            style="height:120px; display:flex; align-items:center; justify-content:center; font-size:20px;"
+                            onclick="searchAll('Football')">⚽ Football</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI SEARCH PAGE -->
+            <div id="searchPage" class="page" style="display:none; padding: 40px 60px;">
+                <div style="text-align:center; margin-bottom:60px;">
+                    <h1 style="font-size:36px; margin-bottom:25px; background:var(--accent-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:900;">AI Smart Search</h1>
+                    <div style="position:relative; max-width:700px; margin:0 auto;">
+                        <input id="aiSearchInput" type="text" placeholder="Describe what you want to watch..." 
+                               style="width:100%; padding:20px 60px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:24px; color:white; font-size:18px; outline:none; box-shadow:0 0 30px rgba(0,0,0,0.5); transition:0.3s;"
+                               oninput="handleSearch(this.value)">
+                        <div style="position:absolute; left:25px; top:22px; opacity:0.5;">🔍</div>
+                        <div style="position:absolute; right:25px; top:18px; cursor:pointer; font-size:20px;" onclick="startVoiceAI()">🎤</div>
+                    </div>
+                </div>
+
+                <div id="searchLoader" style="display:none; text-align:center; margin:40px 0;">
+                    <div class="spinner" style="margin: 0 auto;"></div>
+                    <p style="margin-top:15px; font-size:12px; color:var(--accent); letter-spacing:2px; font-weight:800;">AI ANALYZING DATABASE...</p>
+                </div>
+
+                <h2 id="searchQuery" style="margin-bottom:30px; opacity:0.7; font-size:18px;">Trending Now...</h2>
+                <div id="searchResults" class="row-container"
+                    style="flex-wrap: wrap; display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:30px;">
+                </div>
+            </div>
+
+            <!-- WATCH PAGE - CINEMA ARCHITECTURE -->
+            <div id="watchPage" class="page" style="display:none;">
+                <div id="watchBackdrop" class="watch-backdrop"></div>
+                
+                <div class="watch-content-wrapper">
+                    <div style="padding: 20px 60px;">
+                        <button class="watch-btn-secondary" onclick="closeWatch()">❮ Back to Discovery</button>
+                    </div>
+
+                    <div class="watch-container">
+                        <div class="watch-main">
+                            <div class="player-cinematic">
+                                <iframe id="player" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            </div>
+
+                            <div style="margin-top:40px;">
+                                <div style="display:flex; justify-content:space-between; align-items:end; margin-bottom:15px;">
+                                    <div>
+                                        <h1 id="watchTitle" style="font-size:54px; font-weight:900; letter-spacing:-2px; line-height:1;"></h1>
+                                        <div id="watchMeta" style="margin-top:15px; color:var(--accent); font-weight:600; font-size:18px; opacity:0.9;"></div>
+                                    </div>
+                                    <div id="watchRating" style="font-size:28px; color:#ffbb00; font-weight:900; background:rgba(0,0,0,0.5); padding:10px 20px; border-radius:20px; border:1px solid rgba(255,187,0,0.3);"></div>
+                                </div>
+                                
+                                <div class="watch-action-bar">
+                                    <button id="watchListBtn" class="btn-primary" style="width:auto; padding: 16px 40px; font-size: 18px; border-radius:16px;">+ My List</button>
+                                    <button class="watch-btn-secondary" style="padding: 16px 30px;" onclick="alert('Preparing Ultra-HD Download...')">📥 Download</button>
+                                    <button class="watch-btn-secondary" style="padding: 16px 30px;" onclick="alert('Link Copied!')">🔗 Share</button>
+                                </div>
+
+                                <div style="background:rgba(255,255,255,0.03); padding:40px; border-radius:32px; border:1px solid rgba(255,255,255,0.05); backdrop-filter:blur(10px);">
+                                    <h3 style="margin-bottom:20px; color:rgba(255,255,255,0.5); font-size:12px; text-transform:uppercase; letter-spacing:2px; font-weight:800;">The Premise</h3>
+                                    <p id="watchDesc" style="color:rgba(255,255,255,0.8); line-height:1.9; font-size:18px; margin-bottom:40px;"></p>
+                                    
+                                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px; padding-top:30px; border-top:1px solid rgba(255,255,255,0.1);">
+                                        <div>
+                                            <h4 style="color:var(--accent); font-size:12px; text-transform:uppercase; margin-bottom:12px; letter-spacing:1px;">Starring</h4>
+                                            <div id="watchCast" style="font-size:16px; color:white; font-weight:600;"></div>
+                                        </div>
+                                        <div>
+                                            <h4 style="color:var(--accent); font-size:12px; text-transform:uppercase; margin-bottom:12px; letter-spacing:1px;">Critic Consensus</h4>
+                                            <div id="watchReview" style="font-size:16px; color:rgba(255,255,255,0.7); font-style:italic; line-height:1.5;"></div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top:40px; background:rgba(0,0,0,0.2); padding:25px; border-radius:20px; border:1px solid rgba(255,255,255,0.05);">
+                                        <h4 style="margin-bottom:15px; font-size:15px; font-weight:700;">Community Review</h4>
+                                        <div style="display:flex; gap:15px;">
+                                            <input id="userReviewInput" placeholder="Write your thoughts..." style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white; padding:14px 20px; outline:none;">
+                                            <button class="btn-primary" style="width:140px; border-radius:12px; box-shadow:none;" onclick="submitUserReview()">Post Review</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="watch-sidebar">
+                            <h3 style="margin-bottom:30px; font-size:22px; font-weight:800; display:flex; align-items:center; gap:12px;">
+                                <span style="width:4px; height:24px; background:var(--accent-gradient); border-radius:2px;"></span>
+                                Recommendations
+                            </h3>
+                            <div id="relatedContainer" style="display:flex; flex-direction:column; gap:20px;">
+                                <!-- Related content injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PROFILE PAGE -->
+            <div id="profilePage" class="page" style="display:none;">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="profile-avatar">A</div>
+                        <div>
+                            <h1 id="profName" style="font-size:32px;">Alan J</h1>
+                            <p id="profEmail" style="color:var(--text-muted);">alan@gmail.com</p>
+                            <span class="badge" style="margin: 10px 0 0 0; display:inline-block;">PREMIUM MEMBER</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="stat-card">
+                            <div class="stat-val">75</div>
+                            <div class="stat-label">Movies Available</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val">12</div>
+                            <div class="stat-label">Watchlist</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val">Gold</div>
+                            <div class="stat-label">Plan Type</div>
+                        </div>
+                    </div>
+
+                    <div class="settings-list">
+                        <div style="margin-bottom:20px; text-align:center;">
+                            <div id="profAvatar" style="width:100px; height:100px; margin:0 auto 15px auto; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; cursor:pointer; overflow:hidden; border:2px solid var(--glass-border); transition:0.3s;" onclick="toggleAvatarPicker()">👤</div>
+                            
+                            <div id="avatarPicker" style="display:none; flex-direction:column; gap:15px; background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; border:1px solid var(--glass-border);">
+                                <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+                                    <span style="cursor:pointer; font-size:28px;" onclick="selectAvatar('😎')">😎</span>
+                                    <span style="cursor:pointer; font-size:28px;" onclick="selectAvatar('🤠')">🤠</span>
+                                    <span style="cursor:pointer; font-size:28px;" onclick="selectAvatar('🤖')">🤖</span>
+                                    <span style="cursor:pointer; font-size:28px;" onclick="selectAvatar('👑')">👑</span>
+                                    <span style="cursor:pointer; font-size:28px;" onclick="selectAvatar('🐱')">🐱</span>
+                                    <span style="cursor:pointer; font-size:28px;" onclick="selectAvatar('🔥')">🔥</span>
+                                </div>
+                                <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
+                                    <button onclick="document.getElementById('avatarFile').click()" style="width:100%; padding:10px; background:var(--accent); border:none; color:white; border-radius:10px; font-weight:700; cursor:pointer; font-size:12px;">📤 Upload Custom Image</button>
+                                    <input type="file" id="avatarFile" style="display:none;" accept="image/*" onchange="handleAvatarUpload(this)">
+                                </div>
+                            </div>
+                            <p style="font-size:12px; color:var(--text-muted); margin-top:10px;">Personalize your cinematic identity</p>
+                        </div>
+
+                        <div style="margin-bottom:30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px;">
+                            <label style="font-size:12px; color:var(--accent); text-transform:uppercase; font-weight:900; letter-spacing:1px; margin-bottom:15px; display:block;">Streaming Preferences</label>
+                            
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🎬</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Playback Quality</div>
+                                        <div style="font-size:11px; opacity:0.6;">Optimized for your internet</div>
+                                    </div>
+                                </div>
+                                <select id="setQuality" style="background:var(--surface); border:1px solid var(--glass-border); color:white; border-radius:8px; padding:5px 10px; font-size:12px;">
+                                    <option>Auto (Best)</option>
+                                    <option>4K Ultra HD</option>
+                                    <option>1080p Full HD</option>
+                                    <option>Data Saver</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🌐</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Preferred AI Language</div>
+                                        <div style="font-size:11px; opacity:0.6;">Translate entire site interface</div>
+                                    </div>
+                                </div>
+                                <select id="setSiteLang" style="background:var(--surface); border:1px solid var(--glass-border); color:white; border-radius:8px; padding:5px 10px; font-size:12px;" onchange="setSiteLanguage(this.value)">
+                                    <option value="English">English</option>
+                                    <option value="Hindi">Hindi (हिंदी)</option>
+                                    <option value="Telugu">Telugu (తెలుగు)</option>
+                                    <option value="Tamil">Tamil (தமிழ்)</option>
+                                    <option value="Malayalam">Malayalam (മലയാളം)</option>
+                                    <option value="Spanish">Spanish</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🛡️</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Parental Shield</div>
+                                        <div style="font-size:11px; opacity:0.6;">Filter 18+ content</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="setParental" style="width:20px; height:20px; accent-color:var(--accent);">
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">💬</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Subtitles</div>
+                                        <div style="font-size:11px; opacity:0.6;">Default language</div>
+                                    </div>
+                                </div>
+                                <select id="setSub" style="background:var(--surface); border:1px solid var(--glass-border); color:white; border-radius:8px; padding:5px 10px; font-size:12px;">
+                                    <option>English</option>
+                                    <option>Hindi</option>
+                                    <option>Malayalam</option>
+                                    <option>Off</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🚀</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Auto-Play Discovery</div>
+                                        <div style="font-size:11px; opacity:0.6;">Enable cinematic previews</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="setAutoplay" checked style="width:20px; height:20px; accent-color:var(--accent);">
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🎨</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Neural UI Theme</div>
+                                        <div style="font-size:11px; opacity:0.6;">Apply cinematic color palettes</div>
+                                    </div>
+                                </div>
+                                <select id="setTheme" style="background:var(--surface); border:1px solid var(--glass-border); color:white; border-radius:8px; padding:5px 10px; font-size:12px;">
+                                    <option value="deep-space">Deep Space (Default)</option>
+                                    <option value="midnight-gold">Midnight Gold</option>
+                                    <option value="crimson-theater">Crimson Theater</option>
+                                    <option value="neon-cyber">Neon Cyber</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🎧</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Spatial AI Audio</div>
+                                        <div style="font-size:11px; opacity:0.6;">Enhanced 360 soundstage</div>
+                                    </div>
+                                </div>
+                                <select id="setAudio" style="background:var(--surface); border:1px solid var(--glass-border); color:white; border-radius:8px; padding:5px 10px; font-size:12px;">
+                                    <option value="standard">Standard</option>
+                                    <option value="spatial">Spatial Pro</option>
+                                    <option value="bass">Bass Boost</option>
+                                    <option value="dialogue">Clear Dialogue</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🎬</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Interface Animations</div>
+                                        <div style="font-size:11px; opacity:0.6;">Control motion fidelity</div>
+                                    </div>
+                                </div>
+                                <select id="setAnim" style="background:var(--surface); border:1px solid var(--glass-border); color:white; border-radius:8px; padding:5px 10px; font-size:12px;">
+                                    <option value="cinematic">Cinematic (Smooth)</option>
+                                    <option value="performance">Performance</option>
+                                    <option value="instant">Instant (None)</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:20px;">🕵️</span>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Neural Privacy Mode</div>
+                                        <div style="font-size:11px; opacity:0.6;">Pause watch history tracking</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="setPrivacy" style="width:20px; height:20px; accent-color:var(--accent);">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:12px; color:var(--accent); text-transform:uppercase; font-weight:bold;">Site Recommendations</label>
+                            <textarea id="siteFeedback" placeholder="Tell us how to improve Fast Movie..." style="width:100%; height:80px; background:var(--surface); border:1px solid var(--glass-border); border-radius:8px; color:white; padding:10px; margin-top:5px;"></textarea>
+                            <button class="btn-primary" style="margin-top:10px; width:100%; font-size:13px; padding:12px; border-radius:12px;" onclick="saveProfileUpdates(this)">Update Account & Settings</button>
+                        </div>
+                        
+                        <div class="settings-item" onclick="doLogout()"
+                            style="color:#ff4d4d; border:none; margin-top:20px; font-weight:bold; display:flex; justify-content:center; gap:10px;">
+                            <span>🚪</span> Logout From All Devices
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align:center; padding:40px; opacity:0.5; font-size:12px; letter-spacing:1px; border-top:1px solid rgba(255,255,255,0.05); margin-top:20px;">
+        © 2026 Fast Movie | Premium Movie Experience | Powered by <span style="color:var(--accent); font-weight:900;">__AJ__2026</span>
+    </footer>
+
+    <!-- AI NEURAL ASSISTANT -->
+    <div class="ai-fab" onclick="toggleChat()" title="FAST AI Smart Assistant">
+        <span style="font-size:28px;">🧠</span>
+    </div>
+
+    <!-- AI CHATBOT -->
+    <div class="chat-box" id="chatBox">
+        <div class="chat-header" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6);">
+            <div style="width:40px; height:40px; background:rgba(255,255,255,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px;">🤖</div>
+            <div>
+                <div style="font-weight:700; font-size:15px; letter-spacing:0.5px;">FAST AI Smart Assistant</div>
+                <div style="font-size:10px; opacity:0.8; display:flex; align-items:center; gap:5px;">
+                    <span style="width:6px; height:6px; background:#10b981; border-radius:50%; display:inline-block; animation: pulse 1s infinite;"></span>
+                    Neural Engine Active
+                </div>
+            </div>
+            <button onclick="toggleChat()" style="margin-left:auto; background:none; border:none; color:white; font-size:20px; cursor:pointer;">×</button>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+            <div class="msg bot">Hi! I can find any movie trailer for you. Just ask for a genre or language!</div>
+        </div>
+        <div class="chat-input">
+            <input id="chatInput" placeholder="Ask Fast AI..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="btn-primary" style="width:50px; padding:0;" onclick="sendMessage()">➔</button>
+        </div>
+    </div>
+
+    <script>
+        const FALLBACK_DATABASE = [
+            { id: 1, title: "John Wick: Chapter 4", genre: "Action", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "John Wick uncovers a path to defeating The High Table.", isHero: true },
+            { id: 45, title: "Panchayat", genre: "Comedy", lang: "Hindi", year: "2024", type: "tv", img: "https://img.youtube.com/vi/9XInQJRqGW4/hqdefault.jpg", video: "9XInQJRqGW4", description: "An engineer takes a job in a remote village.", isHero: true },
+            { id: 46, title: "Gullak", genre: "Comedy", lang: "Hindi", year: "2024", type: "tv", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "The everyday life of a middle-class family." },
+            { id: 47, title: "The White Lotus", genre: "Comedy", lang: "English", year: "2023", type: "tv", img: "https://img.youtube.com/vi/OAZWXUkrqw0/hqdefault.jpg", video: "OAZWXUkrqw0", description: "Social dynamics of guests and employees at a resort." },
+            { id: 48, title: "Ted Lasso", genre: "Comedy", lang: "English", year: "2023", type: "tv", img: "https://img.youtube.com/vi/3u7EiioXf_k/hqdefault.jpg", video: "3u7EiioXf_k", description: "An American football coach moves to the UK." },
+            { id: 49, title: "Abbott Elementary", genre: "Comedy", lang: "English", year: "2024", type: "tv", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "Teachers in an underfunded public school." },
+            { id: 50, title: "Mrs. Maisel", genre: "Comedy", lang: "English", year: "2023", type: "tv", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "A housewife discovers her talent for stand-up." },
+            { id: 51, title: "Jury Duty", genre: "Comedy", lang: "English", year: "2023", type: "tv", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "The inner workings of a jury trial through one person." },
+            { id: 52, title: "Wonka", genre: "Comedy", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/otGnTz_HlVk/hqdefault.jpg", video: "otGnTz_HlVk", description: "The story of how a young Willy Wonka became the world's greatest inventor." },
+            { id: 53, title: "Poor Things", genre: "Comedy", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/RlbR5N6ve8S/hqdefault.jpg", video: "RlbR5N6ve8S", description: "Bella Baxter is brought back to life." },
+            { id: 54, title: "Elemental", genre: "Comedy", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/hXzcyx9V0xw/hqdefault.jpg", video: "hXzcyx9V0xw", description: "Residents of different elements live together." },
+            { id: 55, title: "Leo (Animation)", genre: "Comedy", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "A lizard has been stuck in a Florida school." },
+            { id: 56, title: "Migration", genre: "Comedy", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/cQfo0hj8IGM/hqdefault.jpg", video: "cQfo0hj8IGM", description: "A family of ducks tries to convince their father." },
+            { id: 57, title: "Despicable Me 4", genre: "Comedy", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/qEBAO_pWlkU/hqdefault.jpg", video: "qEBAO_pWlkU", description: "Gru and his family return for more mayhem." },
+            { id: 58, title: "Kung Fu Panda 4", genre: "Comedy", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/_inKs4eeHiI/hqdefault.jpg", video: "_inKs4eeHiI", description: "Po is tapped to become the Spiritual Leader." },
+            { id: 59, title: "Garfield", genre: "Comedy", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "S3S9y", description: "The world-famous cat is back." },
+            { id: 60, title: "Mean Girls", genre: "Comedy", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "Cady Heron is a hit with The Plastics." },
+            { id: 61, title: "Anyone But You", genre: "Comedy", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "Two people who hate each other pretend to be a couple." },
+            { id: 62, title: "Bottoms", genre: "Comedy", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/yAN5svZdw_o/hqdefault.jpg", video: "yAN5svZdw_o", description: "Two unpopular girls start a fight club." },
+            { id: 63, title: "Superbad", genre: "Comedy", lang: "English", year: "2007", type: "movie", img: "https://img.youtube.com/vi/4eaZq1SqoZk/hqdefault.jpg", video: "4eaZq1SqoZk", description: "Two co-dependent high school seniors." },
+
+            // HORROR (21 items)
+            { id: 64, title: "Smile 2", genre: "Horror", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/03Z93uMcSIs/hqdefault.jpg", video: "03Z93uMcSIs", description: "A pop star experiences terrifying events." },
+            { id: 65, title: "Evil Dead Rise", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/BqQMCUIIdwk/hqdefault.jpg", video: "BqQMCUIIdwk", description: "Flesh-possessing demons push a family to the brink." },
+            { id: 66, title: "Talk to Me", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/aLAKJu9aJys/hqdefault.jpg", video: "aLAKJu9aJys", description: "Friends conjure spirits using an embalmed hand." },
+            { id: 67, title: "Stranger Things", genre: "Horror", lang: "English", year: "2024", type: "tv", img: "https://img.youtube.com/vi/b9EkMc79ZSU/hqdefault.jpg", video: "b9EkMc79ZSU", description: "Kids in Hawkins face the Upside Down.", isHero: true },
+            { id: 68, title: "Barbarian", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/Dr89pm7kvM0/hqdefault.jpg", video: "Dr89pm7kvM0", description: "A young woman finds her rental home is double-booked." },
+            { id: 69, title: "M3GAN", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/BRb4U99OU80/hqdefault.jpg", video: "BRb4U99OU80", description: "A realistic doll is programmed to be a child's companion." },
+            { id: 70, title: "Pearl", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/L5PW5Ge3YwE/hqdefault.jpg", video: "L5PW5Ge3YwE", description: "The origin story of the villain from X." },
+            { id: 71, title: "X", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/nAsvU9sY6p8/hqdefault.jpg", video: "nAsvU9sY6p8", description: "A group of filmmakers arrives at a farmhouse." },
+            { id: 72, title: "Terrifier 2", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "Art the Clown is resurrected." },
+            { id: 73, title: "Scream VI", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/h74AXqw4Opc/hqdefault.jpg", video: "h74AXqw4Opc", description: "Four survivors of the Ghostface killings leave Woodsboro." },
+            { id: 74, title: "Insidious 5", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/ZuQuOnYqs3Y/hqdefault.jpg", video: "ZuQuOnYqs3Y", description: "The Lamberts must go deeper into The Further." },
+            { id: 75, title: "Five Nights at Freddy's", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/0VH9W_U2fNo/hqdefault.jpg", video: "0VH9W_U2fNo", description: "A security guard starts working at Freddy Fazbear's." },
+            { id: 76, title: "The Nun II", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/QF-oyCwaArU/hqdefault.jpg", video: "QF-oyCwaArU", description: "Sister Irene once again comes face to face with Valak." },
+            { id: 77, title: "Thanksgiving", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "A Thanksgiving-inspired killer terrorizes Plymouth." },
+            { id: 78, title: "When Evil Lurks", genre: "Horror", lang: "Spanish", year: "2023", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "Brothers find a man infected by a demon." },
+            { id: 79, title: "Late Night Devil", genre: "Horror", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "A live television broadcast goes horribly wrong." },
+            { id: 80, title: "Abigail", genre: "Horror", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "Kidnappers must watch a young ballerina." },
+            { id: 81, title: "The First Omen", genre: "Horror", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "A woman uncovers a terrifying conspiracy." },
+            { id: 82, title: "Immaculate", genre: "Horror", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "A devout woman is offered a new role at a convent." },
+            { id: 83, title: "Longlegs", genre: "Horror", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "An FBI agent is assigned to an unsolved serial killer case." },
+            { id: 84, title: "The Conjuring", genre: "Horror", lang: "English", year: "2013", type: "movie", img: "https://img.youtube.com/vi/k10ETZ41q5o/hqdefault.jpg", video: "k10ETZ41q5o", description: "Paranormal investigators help a terrorized family." },
+
+            // SCI-FI (21 items)
+            { id: 85, title: "Dune: Part Two", genre: "Sci-Fi", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/Way9Dexny3w/hqdefault.jpg", video: "Way9Dexny3w", description: "Paul Atreides unites with the Fremen.", isHero: true },
+            { id: 86, title: "Everything Everywhere", genre: "Sci-Fi", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/wxN1T1uxQ2g/hqdefault.jpg", video: "wxN1T1uxQ2g", description: "An aging immigrant is swept up in an adventure." },
+            { id: 87, title: "Avatar: Way of Water", genre: "Sci-Fi", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/d9MyW72ELq0/hqdefault.jpg", video: "d9MyW72ELq0", description: "Jake Sully protects his family on Pandora." },
+            { id: 88, title: "The Creator", genre: "Sci-Fi", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/ex3C1WnN96S/hqdefault.jpg", video: "ex3C1WnN96S", description: "A future war between humans and AI." },
+            { id: 89, title: "Interstellar", genre: "Sci-Fi", lang: "English", year: "2014", type: "movie", img: "https://img.youtube.com/vi/zSWdZVtXT7E/hqdefault.jpg", video: "zSWdZVtXT7E", description: "Explorers travel through a wormhole." },
+            { id: 90, title: "Inception", genre: "Sci-Fi", lang: "English", year: "2010", type: "movie", img: "https://img.youtube.com/vi/YoHD9XEInc0/hqdefault.jpg", video: "YoHD9XEInc0", description: "A thief who steals secrets through dreams." },
+            { id: 91, title: "Tenet", genre: "Sci-Fi", lang: "English", year: "2020", type: "movie", img: "https://img.youtube.com/vi/L3pk_TBkihU/hqdefault.jpg", video: "L3pk_TBkihU", description: "A protagonist journeys through twilight world." },
+            { id: 92, title: "Blade Runner 2049", genre: "Sci-Fi", lang: "English", year: "2017", type: "movie", img: "https://img.youtube.com/vi/gCcx85zbxz4/hqdefault.jpg", video: "gCcx85zbxz4", description: "A new blade runner uncovers a long-buried secret." },
+            { id: 93, title: "Arrival", genre: "Sci-Fi", lang: "English", year: "2016", type: "movie", img: "https://img.youtube.com/vi/tFMo3UJ4B4g/hqdefault.jpg", video: "tFMo3UJ4B4g", description: "A linguist works with the military to communicate with aliens." },
+            { id: 94, title: "The Martian", genre: "Sci-Fi", lang: "English", year: "2015", type: "movie", img: "https://img.youtube.com/vi/ej3ioOneTy8/hqdefault.jpg", video: "ej3ioOneTy8", description: "An astronaut becomes stranded on Mars." },
+            { id: 95, title: "Ex Machina", genre: "Sci-Fi", lang: "English", year: "2014", type: "movie", img: "https://img.youtube.com/vi/bggUmgeMCdc/hqdefault.jpg", video: "bggUmgeMCdc", description: "A programmer participates in a ground-breaking experiment." },
+            { id: 96, title: "Annihilation", genre: "Sci-Fi", lang: "English", year: "2018", type: "movie", img: "https://img.youtube.com/vi/89OP7jr6p94/hqdefault.jpg", video: "89OP7jr6p94", description: "A biologist signs up for a dangerous expedition." },
+            { id: 97, title: "Rebel Moon", genre: "Sci-Fi", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "A peaceful colony is threatened by the armies." },
+            { id: 98, title: "Kingdom of Apes", genre: "Sci-Fi", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "Apes dominate the world." },
+            { id: 99, title: "Godzilla x Kong", genre: "Sci-Fi", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/lV1OOlGwExM/hqdefault.jpg", video: "lV1OOlGwExM", description: "Two ancient titans clash." },
+            { id: 100, title: "Furiosa", genre: "Sci-Fi", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "The origin story of Furiosa." },
+            { id: 101, title: "Severance", genre: "Sci-Fi", lang: "English", year: "2022", type: "tv", img: "https://img.youtube.com/vi/xKT77C0640M/hqdefault.jpg", video: "xKT77C0640M", description: "Workers undergo a procedure to separate memories." },
+            { id: 102, title: "Silo", genre: "Sci-Fi", lang: "English", year: "2023", type: "tv", img: "https://img.youtube.com/vi/8ZYhE7J4S9y/hqdefault.jpg", video: "8ZYhE7J4S9y", description: "People live in a giant underground silo." },
+            { id: 103, title: "Foundation", genre: "Sci-Fi", lang: "English", year: "2023", type: "tv", img: "https://img.youtube.com/vi/OAZWXUkrqw0/hqdefault.jpg", video: "OAZWXUkrqw0", description: "A group of exiles work to save humanity." },
+            { id: 104, title: "Fallout", genre: "Sci-Fi", lang: "English", year: "2024", type: "tv", img: "https://img.youtube.com/vi/V-mugKDQ886/hqdefault.jpg", video: "V-mugKDQ886", description: "The world after a nuclear apocalypse." },
+            { id: 105, title: "3 Body Problem", genre: "Sci-Fi", lang: "English", year: "2024", type: "tv", img: "https://img.youtube.com/vi/mogSbMD6EcY/hqdefault.jpg", video: "mogSbMD6EcY", description: "A fateful decision in 1960s China echoes across time." },
+
+            // ANIME (21 items)
+            { id: 106, title: "Jujutsu Kaisen", genre: "Anime", lang: "Japanese", year: "2023", type: "tv", img: "https://img.youtube.com/vi/h8667S9y/hqdefault.jpg", video: "h8667S9y", description: "A young boy enters Jujutsu High to break a curse." },
+            { id: 107, title: "Demon Slayer", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/vY8p0u0T3nU/hqdefault.jpg", video: "vY8p0u0T3nU", description: "A boy becomes a demon slayer after his family is killed." },
+            { id: 108, title: "Attack on Titan", genre: "Anime", lang: "Japanese", year: "2023", type: "tv", img: "https://img.youtube.com/vi/MGRm4IzK1SQ/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "Humanity fights for survival against giants." },
+            { id: 109, title: "One Piece", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "Luffy and his crew explore a fantastical world." },
+            { id: 110, title: "Blue Lock", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/yU6Yv_K6vsw/hqdefault.jpg", video: "yU6Yv_K6vsw", description: "Japan's strikers compete in a training facility.", isHero: true },
+            { id: 111, title: "Chainsaw Man", genre: "Anime", lang: "Japanese", year: "2022", type: "tv", img: "https://img.youtube.com/vi/v4yv6S9y/hqdefault.jpg", video: "v4yv6S9y", description: "A young man merges with his pet devil." },
+            { id: 112, title: "Spy x Family", genre: "Anime", lang: "Japanese", year: "2023", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "A fake family for a secret mission." },
+            { id: 113, title: "Suzume", genre: "Anime", lang: "Japanese", year: "2022", type: "movie", img: "https://img.youtube.com/vi/6Ei9O9yPZJz8/hqdefault.jpg", video: "6Ei9O9yPZJz8", description: "A girl helps a man close doors from the other side." },
+            { id: 114, title: "Boy and Heron", genre: "Anime", lang: "Japanese", year: "2023", type: "movie", img: "https://img.youtube.com/vi/vS466f-S3Sg/hqdefault.jpg", video: "vS466f-S3Sg", description: "A young boy ventures into a shared world." },
+            { id: 115, title: "Your Name", genre: "Anime", lang: "Japanese", year: "2016", type: "movie", img: "https://img.youtube.com/vi/xU1v6S9y/hqdefault.jpg", video: "xU1v6S9y", description: "Two strangers find they are connected in a bizarre way." },
+            { id: 116, title: "Weathering With You", genre: "Anime", lang: "Japanese", year: "2019", type: "movie", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "A high school boy runs away to Tokyo." },
+            { id: 117, title: "Spirited Away", genre: "Anime", lang: "Japanese", year: "2001", type: "movie", img: "https://img.youtube.com/vi/ByXuk9QqQmc/hqdefault.jpg", video: "ByXuk9QqQmc", description: "A girl wanders into a world of gods and spirits." },
+            { id: 118, title: "Princess Mononoke", genre: "Anime", lang: "Japanese", year: "1997", type: "movie", img: "https://img.youtube.com/vi/4OiMOHRDsHY/hqdefault.jpg", video: "4OiMOHRDsHY", description: "A conflict between forest gods and humans." },
+            { id: 119, title: "My Hero Academia", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "A boy without powers enters a hero academy." },
+            { id: 120, title: "Death Note", genre: "Anime", lang: "Japanese", year: "2006", type: "tv", img: "https://img.youtube.com/vi/NlJZ-YgAt-c/hqdefault.jpg", video: "NlJZ-YgAt-c", description: "A student finds a notebook that kills anyone." },
+            { id: 121, title: "Fullmetal Alchemist", genre: "Anime", lang: "Japanese", year: "2009", type: "tv", img: "https://img.youtube.com/vi/BqwS67S9y/hqdefault.jpg", video: "BqwS67S9y", description: "Two brothers use alchemy to search for a stone." },
+            { id: 122, title: "Hunter x Hunter", genre: "Anime", lang: "Japanese", year: "2011", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "A boy follows his father's footsteps to become a Hunter." },
+            { id: 123, title: "Cowboy Bebop", genre: "Anime", lang: "Japanese", year: "1998", type: "tv", img: "https://img.youtube.com/vi/Wgiw78W_W-E/hqdefault.jpg", video: "Wgiw78W_W-E", description: "Bounty hunters in space in the year 2071." },
+            { id: 124, title: "Evangelion", genre: "Anime", lang: "Japanese", year: "1995", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "Pilots fight against mysterious beings." },
+            { id: 125, title: "Naruto Shippuden", genre: "Anime", lang: "Japanese", year: "2017", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "Naruto continues his quest to become Hokage." },
+            { id: 126, title: "Bleach: TYBW", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "The final battle of the Soul Society." },
+
+            // CRICKET (21 items)
+            { id: 127, title: "IPL 2024 Highlights", genre: "Cricket", lang: "Hindi", year: "2024", type: "sport", img: "https://img.youtube.com/vi/Po3jG2vM1S4/hqdefault.jpg", video: "Po3jG2vM1S4", description: "The best moments from IPL 2024.", isHero: true },
+            { id: 128, title: "T20 World Cup 2024", genre: "Cricket", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/Yf3P66S9S9y/hqdefault.jpg", video: "Yf3P66S9S9y", description: "Highlights from the ICC T20 World Cup." },
+            { id: 129, title: "Asia Cup 2023", genre: "Cricket", lang: "Hindi", year: "2023", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Classic matches from the Asia Cup." },
+            { id: 130, title: "CWC 2023 Final", genre: "Cricket", lang: "English", year: "2023", type: "sport", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "India vs Australia World Cup final." },
+            { id: 131, title: "The Ashes 2023", genre: "Cricket", lang: "English", year: "2023", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "England vs Australia test series." },
+            { id: 132, title: "IND vs PAK T20", genre: "Cricket", lang: "Hindi", year: "2022", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Classic rivalry highlights." },
+            { id: 133, title: "BBL 2024", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Big Bash League highlights." },
+            { id: 134, title: "PSL 2024", genre: "Cricket", lang: "Urdu", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Pakistan Super League highlights." },
+            { id: 135, title: "WPL 2024", genre: "Cricket", lang: "Hindi", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Women's Premier League highlights." },
+            { id: 136, title: "SA20 2024", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "South Africa T20 league." },
+            { id: 137, title: "Vitality Blast", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "English T20 highlights." },
+            { id: 138, title: "CPL 2024", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Caribbean Premier League." },
+            { id: 139, title: "Border-Gavaskar", genre: "Cricket", lang: "English", year: "2023", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Ind vs Aus test series." },
+            { id: 140, title: "Ranji Trophy", genre: "Cricket", lang: "Hindi", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Indian domestic cricket final." },
+            { id: 141, title: "U-19 World Cup", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Youth world cup highlights." },
+            { id: 142, title: "Legends League", genre: "Cricket", lang: "Hindi", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Retired legends playing again." },
+            { id: 143, title: "GT20 Canada", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Canada T20 highlights." },
+            { id: 144, title: "MLC 2024", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Major League Cricket USA." },
+            { id: 145, title: "LPL 2024", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Lanka Premier League." },
+            { id: 146, title: "Abu Dhabi T10", genre: "Cricket", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Fastest format highlights." },
+            { id: 147, title: "The Hundred", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "100-ball cricket highlights." },
+
+            // FOOTBALL (21 items)
+            { id: 148, title: "UCL Final 2024", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/S-E01mS7G8k/hqdefault.jpg", video: "S-E01mS7G8k", description: "Real Madrid vs Dortmund.", isHero: true },
+            { id: 149, title: "Euro 2024 Final", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Spain vs England final." },
+            { id: 150, title: "Copa America", genre: "Football", lang: "Spanish", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Argentina vs Colombia." },
+            { id: 151, title: "Premier League", genre: "Football", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Top goals of the season." },
+            { id: 152, title: "La Liga", genre: "Football", lang: "Spanish", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Spanish league highlights." },
+            { id: 153, title: "Serie A", genre: "Football", lang: "Italian", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Italian league highlights." },
+            { id: 154, title: "Bundesliga", genre: "Football", lang: "German", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "German league highlights." },
+            { id: 155, title: "Ligue 1", genre: "Football", lang: "French", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "French league highlights." },
+            { id: 156, title: "MLS 2024", genre: "Football", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Inter Miami highlights." },
+            { id: 157, title: "FA Cup Final", genre: "Football", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Man City vs Man Utd." },
+            { id: 158, title: "Carabao Cup", genre: "Football", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Liverpool vs Chelsea." },
+            { id: 159, title: "World Cup 2022", genre: "Football", lang: "Global", year: "2022", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Argentina vs France." },
+            { id: 160, title: "Women's WC", genre: "Football", lang: "Global", year: "2023", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Spain vs England." },
+            { id: 161, title: "Asian Cup 2024", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Qatar vs Jordan." },
+            { id: 162, title: "AFCON 2024", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Ivory Coast vs Nigeria." },
+            { id: 163, title: "Saudi Pro League", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Al Nassr highlights." },
+            { id: 164, title: "J-League", genre: "Football", lang: "Japanese", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Japanese league highlights." },
+            { id: 165, title: "K-League", genre: "Football", lang: "Korean", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Korean league highlights." },
+            { id: 166, title: "ISL 2024", genre: "Football", lang: "Hindi", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Indian Super League." },
+            { id: 167, title: "A-League", genre: "Football", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Australian league highlights." },
+            { id: 168, title: "Scottish Prem", genre: "Football", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Celtic vs Rangers." }
+        ];
+
+
+        let movies = [...FALLBACK_DATABASE];
+        let watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+        let history = JSON.parse(localStorage.getItem('history') || '[]');
+        let currentHeroIndex = 0;
+        let heroInterval;
+        let isAdmin = false;
+        let authMode = 'login';
+
+        async function init() {
+            try {
+                const [moviesRes, configRes] = await Promise.all([
+                    fetch('/api/movies'),
+                    fetch('/api/config')
+                ]);
+                const data = await moviesRes.json();
+                const cfg = await configRes.json();
+                
+                if (data && data.length > 0) {
+                    movies = data;
+                }
+
+                    // Apply Global Config
+                    if (cfg) {
+                        const heroRow = document.querySelector('.hero-row');
+                        if (heroRow) heroRow.style.height = cfg.heroHeight || "75vh";
+                        const heroVideo = document.getElementById('heroVideo');
+                        if (heroVideo) {
+                            heroVideo.style.width = cfg.heroScale || "120%";
+                            heroVideo.style.height = cfg.heroScale || "120%";
+                        }
+                        
+                        if (cfg.heroOverrideId) {
+                            let overrideMovie = movies.find(m => getYoutubeId(m.video) === cfg.heroOverrideId);
+                            if (!overrideMovie) {
+                                overrideMovie = {
+                                    title: "ADMIN CHOICE",
+                                    description: "This content has been promoted by the Master Admin.",
+                                    video: cfg.heroOverrideId,
+                                    isHero: true,
+                                    id: 9999
+                                };
+                            }
+                            // Small delay to ensure DOM is ready
+                            setTimeout(() => {
+                                updateHero(overrideMovie);
+                                stopHeroRotation();
+                            }, 500);
+                        } else {
+                            startHeroRotation();
+                        }
+                    }
+            } catch (e) {
+                console.warn("Loading from offline database...");
+                movies = [...FALLBACK_DATABASE];
+                startHeroRotation();
+            }
+            renderAllRows(movies);
+            renderContinueWatching();
+            renderAISuggestions();
+            setMode('login');
+            
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                const data = JSON.parse(user);
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                document.getElementById('profName').innerText = data.name;
+                document.getElementById('profEmail').innerText = data.email;
+                if (data.isAdmin) document.getElementById('adminLink').style.display = 'flex';
+                showPage('home');
+                startHeroRotation();
+            }
+
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                if(splash) {
+                    splash.style.pointerEvents = 'none';
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 800);
+                }
+            }, 1000);
+        }
+
+        function startHeroRotation() {
+            stopHeroRotation(); // Clear any existing
+            heroInterval = setInterval(() => {
+                const trending = movies.filter(m => m.isHero === true);
+                if (!trending.length) return;
+                currentHeroIndex = (currentHeroIndex + 1) % trending.length;
+                updateHero(trending[currentHeroIndex]);
+            }, 8000);
+        }
+
+        function stopHeroRotation() {
+            if (heroInterval) clearInterval(heroInterval);
+        }
+
+        function getYoutubeId(url) {
+            if (!url) return '';
+            if (url.length === 11) return url;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : url;
+        }
+
+        let heroMuted = true;
+
+        function toggleHeroMute() {
+            heroMuted = !heroMuted;
+            document.getElementById('heroMuteBtn').innerText = heroMuted ? '🔇' : '🔊';
+            const trending = movies.filter(m => m.isHero === true);
+            updateHero(trending[currentHeroIndex]);
+        }
+
+        function updateHero(m) {
+            if (!m) return;
+            const heroTitle = document.getElementById('heroTitle');
+            const heroDesc = document.getElementById('heroDesc');
+            const heroVideo = document.getElementById('heroVideo');
+            const heroPlayBtn = document.getElementById('heroPlayBtn');
+            const heroListBtn = document.getElementById('heroListBtn');
+            const dotsContainer = document.getElementById('heroDots');
+
+            // Update Dots
+            const trending = movies.filter(x => x.isHero === true);
+            dotsContainer.innerHTML = trending.map((_, i) => `
+                <div class="dot ${i === currentHeroIndex ? 'active' : ''}" onclick="jumpHero(${i})"></div>
+            `).join('');
+
+            heroTitle.style.opacity = '0';
+            heroVideo.style.opacity = '0';
+            
+            setTimeout(() => {
+                heroTitle.innerText = m.title;
+                heroDesc.innerText = m.description.substring(0, 150) + '...';
+                const videoId = getYoutubeId(m.video);
+                
+                const muteParam = heroMuted ? 1 : 0;
+                heroVideo.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&controls=0&loop=1&playlist=${videoId}&rel=0&modestbranding=1&enablejsapi=1`;
+                
+                heroPlayBtn.onclick = () => openWatch(m.id);
+                heroListBtn.onclick = () => toggleWatchlist(m.id);
+                heroListBtn.innerText = watchlist.includes(m.id) ? '✓ IN LIST' : '+ MY LIST';
+
+                heroTitle.style.opacity = '1';
+                heroVideo.style.opacity = '0.85';
+            }, 500);
+        }
+
+        function jumpHero(index) {
+            currentHeroIndex = index;
+            const trending = movies.filter(m => m.isHero === true);
+            updateHero(trending[index]);
+            startHeroRotation(); // Reset timer
+        }
+
+        function openWatch(id) {
+            const m = movies.find(x => x.id == id);
+            if (!m) return;
+            const videoId = getYoutubeId(m.video);
+            
+            // Update Background Backdrop
+            const backdrop = document.getElementById('watchBackdrop');
+            if (backdrop) backdrop.style.backgroundImage = `url(${m.img})`;
+            
+            document.getElementById('player').src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            document.getElementById('watchTitle').innerText = m.title;
+            document.getElementById('watchMeta').innerText = `${m.year} • ${m.genre} • ${m.lang} • Ultra HD 4K`;
+            document.getElementById('watchDesc').innerText = m.description;
+            document.getElementById('watchCast').innerText = m.cast || 'Fast Movie Ensemble';
+            document.getElementById('watchRating').innerText = `⭐ ${m.rating || '8.5'}/10`;
+            document.getElementById('watchReview').innerText = `"${m.review || 'An absolute must-watch for all movie lovers!'}"`;
+            
+            const watchListBtn = document.getElementById('watchListBtn');
+            watchListBtn.innerText = watchlist.includes(m.id) ? '✓ In List' : '+ My List';
+            watchListBtn.onclick = () => toggleWatchlist(m.id);
+
+            const related = movies.filter(x => x.genre === m.genre && x.id !== m.id).slice(0, 8);
+            document.getElementById('relatedContainer').innerHTML = related.map(r => `
+                <div class="movie-card" onclick="openWatch(${r.id})" style="width:100%; display:flex; gap:15px; height:90px; background:rgba(255,255,255,0.05); border-radius:16px; overflow:hidden; border: 1px solid rgba(255,255,255,0.05); cursor:pointer;">
+                    <img src="${r.img}" style="width:120px; height:100%; object-fit:cover; transition:0.3s;">
+                    <div style="padding:10px; display:flex; flex-direction:column; justify-content:center;">
+                        <div style="font-weight:bold; font-size:15px; color:white;">${r.title}</div>
+                        <div style="font-size:12px; color:var(--accent); margin-top:4px;">${r.year} • ⭐ ${r.rating || '8.2'}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            showPage('watch');
+            window.scrollTo(0, 0);
+            
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const isPrivate = user && user.privacy === true;
+
+            if (!isPrivate) {
+                // Move to front if already exists, or add new
+                history = history.filter(x => x != m.id);
+                history.unshift(m.id);
+                localStorage.setItem('history', JSON.stringify(history.slice(0, 20)));
+                renderContinueWatching();
+            }
+        }
+
+        function toggleWatchlist(id) {
+            if (watchlist.includes(id)) {
+                watchlist = watchlist.filter(x => x !== id);
+            } else {
+                watchlist.push(id);
+            }
+            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+            renderAllRows(movies);
+
+            const heroListBtn = document.getElementById('heroListBtn');
+            if (heroListBtn) heroListBtn.innerText = watchlist.includes(id) ? '✓ In List' : '+ My List';
+            const watchListBtn = document.getElementById('watchListBtn');
+            if (watchListBtn) watchListBtn.innerText = watchlist.includes(id) ? '✓ In List' : '+ My List';
+        }
+
+        function renderAISuggestions() {
+            const aiRow = document.getElementById('aiRow');
+            const container = document.getElementById('aiContainer');
+            if (!aiRow || !container) return;
+
+            if (!history.length) {
+                aiRow.style.display = 'block';
+                const defaults = movies.filter(m => m.year === '2024').slice(0, 8);
+                container.innerHTML = defaults.map(m => createMovieCard(m)).join('');
+                return;
+            }
+
+            aiRow.style.display = 'block';
+            const lastMovie = movies.find(m => m.id == history[0]);
+            if (!lastMovie) return;
+
+            const suggestions = movies.filter(m =>
+                m.genre === lastMovie.genre && !history.includes(m.id)
+            ).slice(0, 10);
+
+            if (suggestions.length < 5) {
+                const more = movies.filter(m =>
+                    m.lang === lastMovie.lang && !history.includes(m.id) && !suggestions.find(s => s.id === m.id)
+                ).slice(0, 5);
+                suggestions.push(...more);
+            }
+
+            container.innerHTML = suggestions.map(m => createMovieCard(m)).join('');
+        }
+
+        function getUniquePoster(m) {
+            const hash = m.title.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            const hue = hash % 360;
+            const svg = `<svg width="200" height="300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="g${m.id}" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="hsl(${hue}, 60%, 40%)"/>
+                        <stop offset="100%" stop-color="hsl(${(hue + 60) % 360}, 60%, 20%)"/>
+                    </linearGradient>
+                </defs>
+                <rect width="200" height="300" fill="url(#g${m.id})"/>
+                <rect width="200" height="300" fill="rgba(0,0,0,0.3)"/>
+                <text x="50%" y="45%" font-family="Inter, sans-serif" font-size="80" fill="white" opacity="0.1" text-anchor="middle" font-weight="900">${m.id}</text>
+                <text x="50%" y="85%" font-family="Inter, sans-serif" font-size="16" fill="white" text-anchor="middle" font-weight="800">${m.title.toUpperCase()}</text>
+                <rect x="20" y="240" width="40" height="4" fill="white" opacity="0.5"/>
+            </svg>`;
+            return `data:image/svg+xml;base64,${btoa(svg)}`;
+        }
+
+        function createMovieCard(m) {
+            const imgUrl = m.img;
+            const uniquePlaceholder = getUniquePoster(m);
+            const isNew = m.year === '2024';
+
+            return `
+                <div class="movie-card" onclick="openWatch(${m.id})">
+                    <img src="${imgUrl}" 
+                         onload="if(this.naturalWidth==120) { this.src = this.src.includes('maxresdefault') ? this.src.replace('maxresdefault', 'hqdefault') : '${uniquePlaceholder}'; }"
+                         onerror="if(this.src.includes('maxresdefault')) { this.src = this.src.replace('maxresdefault', 'hqdefault'); } else { this.src='${uniquePlaceholder}'; }">
+                    
+                    ${isNew ? '<div style="position:absolute; top:15px; left:15px; background:var(--accent-gradient); padding:4px 12px; border-radius:10px; font-size:10px; font-weight:900; z-index:10; box-shadow:0 0 15px var(--accent-glow); border: 1px solid rgba(255,255,255,0.2);">NEW 2024</div>' : ''}
+                    
+                    <div class="movie-info">
+                        <div class="movie-name">${m.title}</div>
+                        <div class="movie-meta">
+                            <span>${m.genre}</span>
+                            <span style="opacity:0.4;">|</span>
+                            <span>${m.year}</span>
+                            <span style="opacity:0.4;">|</span>
+                            <span style="color: #00ff88;">HD</span>
+                        </div>
+                    </div>
+                    ${watchlist.includes(m.id) ? '<div style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); padding:4px 10px; border-radius:10px; font-size:10px; font-weight:800; z-index:10; border:1px solid var(--glass-border);">✓ LIST</div>' : ''}
+                </div>
+            `;
+        }
+
+        function renderRow(containerId, filteredMovies) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = filteredMovies.map(m => `
+                <div class="movie-card" onclick="openPlayer(${m.id})">
+                    <div class="match-badge">AI ${Math.floor(Math.random() * 15) + 85}% Match</div>
+                    <img class="movie-img" src="${m.img}" alt="${m.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x450?text=${m.title}'">
+                    <div class="movie-info">
+                        <h3 class="movie-title">${m.title}</h3>
+                        <p class="movie-meta">${m.year} • ${m.genre}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAllRows(data) {
+            renderSection('movie', 'movieRows', data);
+            renderSection('tv', 'tvRows', data);
+            renderSection('sport', 'sportsRows', data);
+        }
+
+        function renderSection(type, containerId, data) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            const filtered = data.filter(m => (m.type || 'movie') === type);
+            if (!filtered.length) return;
+
+            const title = type === 'movie' ? 'Blockbuster Movies' : type === 'tv' ? 'Must-Watch Series' : 'Live Sports & Highlights';
+
+            const row = document.createElement('div');
+            row.className = 'row';
+            row.innerHTML = `
+                <div class="row-title">
+                    <div style="width:4px; height:24px; background:var(--accent); border-radius:4px; box-shadow:0 0 15px var(--accent);"></div>
+                    ${title}
+                </div>
+                <div class="row-container">
+                    ${filtered.map(m => createMovieCard(m)).join('')}
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        function renderContinueWatching() {
+            const container = document.getElementById('continueWatchingContainer');
+            const row = document.getElementById('continueWatchingRow');
+            if (!container || !row) return;
+
+            if (!history || history.length === 0) {
+                row.style.display = 'none';
+                return;
+            }
+
+            const cards = history.map(id => {
+                const m = movies.find(x => x.id == id);
+                return m ? createMovieCard(m) : '';
+            }).filter(c => c !== '').join('');
+
+            if (cards) {
+                row.style.display = 'block';
+                container.innerHTML = cards;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+
+        function filterLang(l, el) {
+            document.querySelectorAll('.nav-tabs .tab-item').forEach(i => i.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            if (l === 'All') {
+                renderAllRows(movies);
+            } else {
+                const filtered = movies.filter(m => m.lang === l);
+                document.getElementById('movieRows').innerHTML = `
+                    <div class="row">
+                        <div class="row-title">✨ ${l} Hits</div>
+                        <div class="row-container" style="flex-wrap: wrap;">
+                            ${filtered.map(m => createMovieCard(m)).join('')}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('tvRows').innerHTML = '';
+                document.getElementById('sportsRows').innerHTML = '';
+            }
+        }
+
+        function doLogout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        function doLogin(data) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('profName').innerText = data.name;
+            document.getElementById('profEmail').innerText = data.email;
+            if (data.isAdmin) document.getElementById('adminLink').style.display = 'flex';
+            localStorage.setItem('currentUser', JSON.stringify(data));
+            showPage('home');
+            startHeroRotation();
+        }
+
+        function setMode(m) {
+            authMode = m;
+            document.getElementById('tabLogin').className = m === 'login' ? 'active' : '';
+            document.getElementById('tabRegister').className = m === 'register' ? 'active' : '';
+            
+            const nameGroup = document.getElementById('nameGroup');
+            const passBox = document.getElementById('passBox');
+            const otpBtn = document.getElementById('otpBtn');
+            const otpBox = document.getElementById('otpBox');
+            const userPass = document.getElementById('userPass');
+            const forgotLink = document.getElementById('forgotLink');
+            const authBtn = document.getElementById('authBtn');
+
+            if (m === 'login') {
+                nameGroup.style.display = 'none';
+                otpBtn.style.display = 'none';
+                otpBox.style.display = 'none';
+                passBox.style.display = 'block';
+                forgotLink.style.display = 'block';
+                authBtn.style.display = 'block';
+                authBtn.innerText = 'Sign In';
+                userPass.placeholder = "Enter Your Password";
+            } else if (m === 'register') {
+                nameGroup.style.display = 'block';
+                otpBtn.style.display = 'block';
+                otpBtn.innerText = "Send OTP";
+                otpBox.style.display = 'none';
+                passBox.style.display = 'block';
+                forgotLink.style.display = 'none';
+                authBtn.style.display = 'block';
+                authBtn.innerText = 'Create Account';
+                userPass.placeholder = "Create a Password";
+            } else if (m === 'forgot') {
+                nameGroup.style.display = 'none';
+                otpBtn.style.display = 'block';
+                otpBtn.innerText = "Send Reset OTP";
+                otpBox.style.display = 'none';
+                passBox.style.display = 'none';
+                forgotLink.style.display = 'none';
+                authBtn.style.display = 'none';
+                userPass.placeholder = "Enter New Password";
+            }
+            
+            document.getElementById('authError').style.display = 'none';
+            checkAdminAuto();
+        }
+
+        function showSearch() {
+            showPage('search');
+            const input = document.getElementById('aiSearchInput');
+            if(input) input.focus();
+        }
+
+        let searchTimeout;
+        async function handleSearch(q) {
+            const loader = document.getElementById('searchLoader');
+            const queryLabel = document.getElementById('searchQuery');
+            const container = document.getElementById('searchResults');
+
+            if (!q || q.length < 1) {
+                queryLabel.innerText = "Trending Now...";
+                container.innerHTML = movies.slice(0, 12).map(m => createMovieCard(m)).join('');
+                return;
+            }
+            
+            showPage('search');
+            if(loader) loader.style.display = 'block';
+            queryLabel.innerText = `Searching for "${q}"...`;
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                let results = [];
+                try {
+                    // Try API first
+                    const res = await fetch(`/api/smart-search?q=${encodeURIComponent(q)}`);
+                    if (res.ok) {
+                        results = await res.json();
+                    } else {
+                        throw new Error("API Down");
+                    }
+                } catch (e) {
+                    console.warn("AI Search failed, using local database...");
+                    // Local fallback search (case-insensitive)
+                    const lowerQ = q.toLowerCase();
+                    results = movies.filter(m => 
+                        m.title.toLowerCase().includes(lowerQ) || 
+                        m.genre.toLowerCase().includes(lowerQ) ||
+                        (m.description && m.description.toLowerCase().includes(lowerQ))
+                    );
+                } finally {
+                    if(loader) loader.style.display = 'none';
+                    queryLabel.innerText = results.length > 0 ? `Found ${results.length} results for "${q}"` : `No matches found for "${q}".`;
+                    container.innerHTML = results.map(m => createMovieCard(m)).join('');
+                }
+            }, 400); 
+        }
+
+        function searchAll(q) {
+            const input = document.getElementById('aiSearchInput');
+            if (input) input.value = q;
+            handleSearch(q);
+        }
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            
+            // Handle page ID mapping
+            let targetId = pageId;
+            if (pageId === 'home') targetId = 'homePage';
+            if (pageId === 'tv') targetId = 'tvPage';
+            if (pageId === 'sports') targetId = 'sportsPage';
+            if (pageId === 'categories') targetId = 'categoriesPage';
+            if (pageId === 'watch') targetId = 'watchPage';
+            if (pageId === 'profile') targetId = 'profilePage';
+            if (pageId === 'search') targetId = 'searchPage';
+
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.style.display = 'block';
+                
+                // LOAD PROFILE DATA IF NEEDED
+                if (pageId === 'profile') {
+                    const user = JSON.parse(localStorage.getItem('currentUser'));
+                    if (user) {
+                        document.getElementById('profName').innerText = user.name || "Alan J";
+                        document.getElementById('profEmail').innerText = user.email || "alan@gmail.com";
+                        document.getElementById('profFeedback').value = user.feedback || "";
+                        
+                        const prof = document.getElementById('profAvatar');
+                        const av = user.avatar || "👤";
+                        if (av.startsWith('data:image') || av.startsWith('http')) {
+                            prof.innerHTML = `<img src="${av}" style="width:100%; height:100%; object-fit:cover;">`;
+                        } else {
+                            prof.innerHTML = av;
+                            prof.style.fontSize = '50px';
+                        }
+                        
+                        // Load Other Settings
+                        if (user.quality) document.getElementById('setQuality').value = user.quality;
+                        if (user.siteLang) document.getElementById('setSiteLang').value = user.siteLang;
+                        if (user.parental !== undefined) document.getElementById('setParental').checked = user.parental;
+                        if (user.subtitles) document.getElementById('setSub').value = user.subtitles;
+                        if (user.autoplay !== undefined) document.getElementById('setAutoplay').checked = user.autoplay;
+                        
+                        // Premium Settings
+                        if (user.theme) {
+                            document.getElementById('setTheme').value = user.theme;
+                            applyTheme(user.theme);
+                        }
+                        if (user.audio) document.getElementById('setAudio').value = user.audio;
+                        if (user.anim) document.getElementById('setAnim').value = user.anim;
+                        if (user.privacy !== undefined) document.getElementById('setPrivacy').checked = user.privacy;
+                    }
+                }
+
+                // Update Sidebar
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                const sidebarItem = document.querySelector(`.nav-item[onclick*="'${pageId}'"]`);
+                if (sidebarItem) sidebarItem.classList.add('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function closeWatch() {
+            document.getElementById('player').src = '';
+            showPage('home');
+        }
+
+        function checkAdminAuto() {
+            const email = document.getElementById('userEmail').value.trim();
+            const userPass = document.getElementById('userPass');
+            const otpBtn = document.getElementById('otpBtn');
+
+            if (authMode === 'register') return;
+
+            // Admin Bypass Logic for Login - Based on Email
+            if (email === 'alan@gmail.com') {
+                isAdmin = true;
+                userPass.placeholder = "Enter Admin Password";
+            } else {
+                isAdmin = false;
+                userPass.placeholder = "Enter Your Password";
+            }
+            // Hide OTP button for regular Login mode, but keep it for Register and Forgot
+            if (authMode === 'login') {
+                otpBtn.style.display = 'none';
+            }
+        }
+
+        async function handleSendOTP() {
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const err = document.getElementById('authError');
+            if (!email) { err.innerText = "Email required"; err.style.display = 'block'; return; }
+            
+            const endpoint = authMode === 'forgot' ? '/api/forgot-password' : '/api/send-otp';
+            
+            console.log(`[AUTH] Requesting OTP for: ${email} via ${endpoint}`);
+            try {
+                const res = await fetch(endpoint, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email }) 
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('otpBox').style.display = 'block';
+                    if (authMode === 'forgot') {
+                        document.getElementById('passBox').style.display = 'block';
+                        document.getElementById('authBtn').style.display = 'block';
+                        document.getElementById('authBtn').innerText = "Reset Password";
+                    }
+                    err.innerText = data.message; err.style.display = 'block'; err.style.color = '#00ff88';
+                } else { 
+                    err.innerText = data.error; err.style.display = 'block'; err.style.color = '#ff4d4d';
+                }
+            } catch (e) { 
+                err.innerText = "Server Error. Is the backend running?"; 
+                err.style.display = 'block'; 
+            }
+        }
+
+        async function handleAuth() {
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const password = document.getElementById('userPass').value;
+            const otp = document.getElementById('otpInput').value.trim();
+            const err = document.getElementById('authError');
+            
+            let endpoint = '/api/login';
+            if (authMode === 'register') endpoint = '/api/register';
+            if (authMode === 'forgot') endpoint = '/api/reset-password';
+            
+            // SMART VALIDATION
+            if (!email) { err.innerText = "Email is required"; err.style.display = 'block'; return; }
+            if (!password) { err.innerText = "Password is required"; err.style.display = 'block'; return; }
+            
+            if (authMode === 'register' || authMode === 'forgot') {
+                if (authMode === 'register' && !name) { err.innerText = "Full Name is required"; err.style.display = 'block'; return; }
+                if (!otp) { err.innerText = "Please enter the OTP sent to your email"; err.style.display = 'block'; return; }
+            }
+
+            const isMasterAdmin = (email === 'alan@gmail.com');
+            const masterPass = 'aj1234';
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, otp })
+                });
+                const data = await res.json();
+                if (res.ok) { 
+                    if (authMode === 'forgot') {
+                        alert("Password Reset Successful! You can now sign in with your new password.");
+                        setMode('login');
+                    } else {
+                        doLogin(data); 
+                    }
+                } else { 
+                    err.innerText = data.error || "Authentication failed"; 
+                    err.style.display = 'block'; 
+                    err.style.color = '#ff4d4d'; 
+                }
+            } catch (e) {
+                if (isMasterAdmin && password === masterPass) {
+                    doLogin({ name: 'Super Admin', email: email || 'alan@gmail.com', isAdmin: true, isLoggedIn: true });
+                } else { 
+                    err.innerText = "System Connectivity Issue. Ensure server is running."; 
+                    err.style.display = 'block'; 
+                }
+            }
+        }
+
+        function toggleChat() {
+            const b = document.getElementById('chatBox');
+            if (b.style.display !== 'flex') {
+                showNeuralProcessing("Connecting to Neural Assistant...", 1500, () => {
+                    b.style.display = 'flex';
+                });
+            } else {
+                b.style.display = 'none';
+            }
+        }
+
+        function startVoiceAI() {
+            if (!('webkitSpeechRecognition' in window)) {
+                return alert("AI Voice Search is only supported in Chrome.");
+            }
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.onstart = () => {
+                showNeuralProcessing("AI LISTENING...", 3000);
+                document.getElementById('voiceBtn').style.color = 'var(--accent)';
+            };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('searchInput').value = transcript;
+                handleSearch(transcript);
+                document.getElementById('voiceBtn').style.color = 'white';
+            };
+            recognition.onerror = () => {
+                document.getElementById('voiceBtn').style.color = 'white';
+            };
+            recognition.start();
+        }
+
+        function initAIRecs(movies) {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const favGenres = user && user.favorites ? user.favorites.map(f => f.genre) : ['Action'];
+            const recs = movies.filter(m => favGenres.some(g => m.genre.includes(g))).slice(0, 10);
+            renderRow('aiRecRow', recs);
+        }
+
+        function showNeuralProcessing(text, duration, callback) {
+            const overlay = document.getElementById('neuralOverlay');
+            overlay.querySelector('.neural-text').innerText = text;
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                if(callback) callback();
+            }, duration);
+        }
+
+        function startNeuralSearch() {
+            showNeuralProcessing("SCANNING MOVIE UNIVERSE...", 2000, () => {
+                alert("Neural Search complete. Discovering top-tier matches for your profile.");
+                document.getElementById('searchInput').focus();
+            });
+        }
+
+        function sendMessage() {
+            const inp = document.getElementById('chatInput');
+            const msg = inp.value.trim();
+            if (!msg) return;
+            const box = document.getElementById('chatMessages');
+            box.innerHTML += `<div class="msg user">${msg}</div>`;
+            inp.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            // AI THINKING STATE
+            const botId = 'bot-' + Date.now();
+            box.innerHTML += `<div id="${botId}" class="msg bot" style="opacity:0.5;">Neural Engine processing...</div>`;
+            box.scrollTop = box.scrollHeight;
+
+            setTimeout(() => {
+                const q = msg.toLowerCase();
+                let reply = "I'm analyzing your request. Try asking for 'Action movies', 'Mood-based suggestions', or 'Latest hits'!";
+                
+                const found = movies.filter(m =>
+                    q.includes(m.genre.toLowerCase()) ||
+                    q.includes(m.lang.toLowerCase()) ||
+                    q.includes(m.title.toLowerCase())
+                ).slice(0, 3);
+
+                if (q.includes('mood') || q.includes('feel') || q.includes('sad') || q.includes('happy') || q.includes('bor')) {
+                    reply = "<b>Neural Mood Analysis:</b> Based on your current state, I recommend 'Manjummel Boys' for a high-stakes thrill or 'Inside Out 2' for a heartwarming journey.";
+                } else if (found.length > 0) {
+                    reply = `<b>AI Discovery:</b> I've located matches for you: <b>${found.map(m => m.title).join(', ')}</b>. Would you like to watch any of these now?`;
+                } else if (q.includes('hello') || q.includes('hi')) {
+                    reply = "<b>Neural Link Established.</b> I am your Fast AI Smart Assistant. How can I optimize your streaming discovery today?";
+                }
+
+                const botMsg = document.getElementById(botId);
+                if(botMsg) {
+                    botMsg.innerHTML = reply;
+                    botMsg.style.opacity = '1';
+                }
+                box.scrollTop = box.scrollHeight;
+            }, 1200);
+        }
+
+        function togglePass(id, el) {
+            const i = document.getElementById(id);
+            i.type = i.type === 'password' ? 'text' : 'password';
+            el.innerText = i.type === 'password' ? '👁️' : '🙈';
+        }
+
+        function toggleQR() {
+            const fields = document.getElementById('authFields');
+            const qr = document.getElementById('qrSection');
+            if (fields.style.display === 'none') {
+                fields.style.display = 'block';
+                qr.style.display = 'none';
+            } else {
+                fields.style.display = 'none';
+                qr.style.display = 'block';
+            }
+        }
+
+        let currentWatchingMovieId = null;
+
+        function submitUserReview() {
+            const input = document.getElementById('userReviewInput');
+            const comment = input.value.trim();
+            if (!comment) return;
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) return alert("Please login to post reviews");
+
+            fetch('/api/post-review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ movieId: currentWatchingMovieId, email: user.email, comment })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    input.value = '';
+                    alert("Review posted successfully! It will be visible to the admin.");
+                }
+            });
+        }
+
+        function toggleAvatarPicker() {
+            const p = document.getElementById('avatarPicker');
+            p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function selectAvatar(a) {
+            const prof = document.getElementById('profAvatar');
+            prof.innerHTML = a;
+            prof.style.fontSize = '50px';
+            toggleAvatarPicker();
+        }
+
+        function handleAvatarUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                const prof = document.getElementById('profAvatar');
+                prof.innerHTML = `<img src="${base64}" style="width:100%; height:100%; object-fit:cover;">`;
+                toggleAvatarPicker();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveProfileUpdates(btn) {
+            const originalText = btn ? btn.innerText : "Update Account & Settings";
+            if(btn) {
+                btn.innerText = "Saving...";
+                btn.disabled = true;
+            }
+
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const avatarHtml = document.getElementById('profAvatar').innerHTML;
+            
+            // Check if it's an image or emoji
+            let avatar = avatarHtml;
+            if (avatarHtml.includes('<img')) {
+                const match = avatarHtml.match(/src="([^"]+)"/);
+                if (match) avatar = match[1];
+            }
+            
+            const feedback = document.getElementById('siteFeedback').value.trim();
+            
+            // New Settings
+            const quality = document.getElementById('setQuality').value;
+            const siteLang = document.getElementById('setSiteLang').value;
+            const parental = document.getElementById('setParental').checked;
+            const subtitles = document.getElementById('setSub').value;
+            const autoplay = document.getElementById('setAutoplay').checked;
+            
+            const theme = document.getElementById('setTheme').value;
+            const audio = document.getElementById('setAudio').value;
+            const anim = document.getElementById('setAnim').value;
+            const privacy = document.getElementById('setPrivacy').checked;
+
+            try {
+                const res = await fetch('/api/update-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: user.email, avatar, feedback,
+                        quality, siteLang, parental, subtitles, autoplay,
+                        theme, audio, anim, privacy
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    user.avatar = avatar;
+                    user.feedback = feedback;
+                    user.quality = quality;
+                    user.siteLang = siteLang;
+                    user.parental = parental;
+                    user.subtitles = subtitles;
+                    user.autoplay = autoplay;
+                    user.theme = theme;
+                    user.audio = audio;
+                    user.anim = anim;
+                    user.privacy = privacy;
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    applyTheme(theme);
+                    alert("Account & Premium Settings Updated Successfully!");
+                } else {
+                    alert("Error updating profile: " + (data.error || "Unknown error"));
+                }
+            } catch(e) {
+                alert("Connection failed. Is the server running?");
+            } finally {
+                if(btn) {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Updated openWatch to track current ID
+        const originalOpenWatch = openWatch;
+        openWatch = function(id) {
+            currentWatchingMovieId = id;
+            originalOpenWatch(id);
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user && user.avatar) document.getElementById('profAvatar').innerText = user.avatar;
+            if (user && user.feedback) document.getElementById('siteFeedback').value = user.feedback;
+        };
+
+        // --- AI GLOBAL LANGUAGE SYSTEM ---
+        let currentSiteLanguage = 'English';
+        const siteTranslations = {
+            'Hindi': {
+                'Home': 'मुख्य', 'Search': 'खोजें', 'TV Shows': 'टीवी शो', 'Sports': 'खेल', 
+                'Categories': 'श्रेणियाँ', 'Settings': 'सेटअप', 'Logout': 'लॉगआउट',
+                'Trending Now': 'अभी चलन में', 'WATCH NOW': 'अभी देखें', 'MY LIST': 'मेरी सूची',
+                'Continue Watching': 'देखना जारी रखें', 'AI Recommended For You': 'आपके लिए एआई सिफारिश',
+                'Recommendations': 'सिफारिशें', 'Back to Discovery': 'वापस जाएं', 'Download': 'डाउनलोड',
+                'Share': 'साझा करें', 'The Premise': 'आधार', 'Starring': 'कलाकार', 'Critic Consensus': 'समीक्षक',
+                'Community Review': 'समुदाय समीक्षा', 'Post Review': 'समीक्षा भेजें'
+            },
+            'Telugu': {
+                'Home': 'హోమ్', 'Search': 'సెర్చ్', 'TV Shows': 'టీవీ షోలు', 'Sports': 'క్రీడలు',
+                'Categories': 'కేటగిరీలు', 'Settings': 'సెట్టింగులు', 'Logout': 'లాగ్ అవుట్',
+                'Trending Now': 'ట్రెండింగ్', 'WATCH NOW': 'ఇప్పుడే చూడండి', 'MY LIST': 'నా లిస్ట్',
+                'Recommendations': 'సిఫార్సులు', 'The Premise': 'కథాంశం', 'Download': 'డౌన్లోడ్'
+            },
+            'Tamil': {
+                'Home': 'முகப்பு', 'Search': 'தேடல்', 'TV Shows': 'தொலைக்காட்சி', 'Sports': 'விளையாட்டு',
+                'Categories': 'வகைகள்', 'Settings': 'அமைப்புகள்', 'Logout': 'வெளியேறு',
+                'Trending Now': 'ட்ரெண்டிங்', 'WATCH NOW': 'இப்போது பார்', 'MY LIST': 'எனது பட்டியல்'
+            },
+            'Malayalam': {
+                'Home': 'ഹോം', 'Search': 'തിരയുക', 'TV Shows': 'ടിവി ഷോകൾ', 'Sports': 'കായികം',
+                'Categories': 'വിഭാഗങ്ങൾ', 'Settings': 'ക്രമീകരണങ്ങൾ', 'Logout': 'പുറത്തുകടക്കുക'
+            }
+        };
+
+        function toggleLanguagePicker() {
+            const p = document.getElementById('languagePicker');
+            p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function setSiteLanguage(lang) {
+            currentSiteLanguage = lang;
+            toggleLanguagePicker();
+            
+            const map = siteTranslations[lang] || {};
+            
+            // Translate Static UI Elements
+            document.querySelectorAll('h1, h2, h3, h4, button, .row-title, .tab-item').forEach(el => {
+                // Find deep text nodes to preserve icons
+                for (let node of el.childNodes) {
+                    if (node.nodeType === 3) {
+                        const text = node.nodeValue.trim();
+                        if (map[text]) node.nodeValue = node.nodeValue.replace(text, map[text]);
+                    }
+                }
+            });
+
+            // Specific UI Fixes
+            const playBtn = document.getElementById('heroPlayBtn');
+            if (playBtn && map['WATCH NOW']) playBtn.innerHTML = '▶ ' + map['WATCH NOW'];
+            
+            const listBtn = document.getElementById('heroListBtn');
+            if (listBtn && map['MY LIST']) listBtn.innerText = '+ ' + map['MY LIST'];
+
+            // Sidebar Tooltips
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const title = item.getAttribute('title');
+                if (map[title]) item.setAttribute('title', map[title]);
+            });
+
+            console.log(`AI Language Engine: Switched to ${lang}`);
+            
+            // Re-render rows to apply language context if needed
+            renderAllRows(movies);
+        }
+
+        function doLogout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        function applyTheme(t) {
+            const r = document.documentElement;
+            if (t === 'midnight-gold') {
+                r.style.setProperty('--accent', '#ffbb00');
+                r.style.setProperty('--accent-gradient', 'linear-gradient(135deg, #ffbb00, #ff8800)');
+                r.style.setProperty('--accent-glow', 'rgba(255, 187, 0, 0.4)');
+            } else if (t === 'crimson-theater') {
+                r.style.setProperty('--accent', '#ff4d4d');
+                r.style.setProperty('--accent-gradient', 'linear-gradient(135deg, #ff4d4d, #b91c1c)');
+                r.style.setProperty('--accent-glow', 'rgba(255, 77, 77, 0.4)');
+            } else if (t === 'neon-cyber') {
+                r.style.setProperty('--accent', '#00ff88');
+                r.style.setProperty('--accent-gradient', 'linear-gradient(135deg, #00ff88, #007aff)');
+                r.style.setProperty('--accent-glow', 'rgba(0, 255, 136, 0.4)');
+            } else {
+                // Reset to Deep Space
+                r.style.setProperty('--accent', '#007aff');
+                r.style.setProperty('--accent-gradient', 'linear-gradient(135deg, #007aff, #00c6ff)');
+                r.style.setProperty('--accent-glow', 'rgba(0, 122, 255, 0.5)');
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
