@@ -274,6 +274,59 @@
             box-shadow: 0 50px 100px rgba(0,0,0,0.5);
         }
 
+        /* --- RESPONSIVE DASHBOARD --- */
+
+        /* 📱 TABLET (Up to 1024px) */
+        @media (max-width: 1024px) {
+            :root { --sidebar-width: 80px; }
+            .nav-item { padding: 14px; justify-content: center; }
+            .nav-item span, .nav-label, .logo-section div { display: none; }
+            .logo-section { justify-content: center; }
+            .dashboard-grid { grid-template-columns: 1fr; padding: 20px; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .search-box { width: 250px; }
+        }
+
+        /* 📱 MOBILE (Up to 768px) */
+        @media (max-width: 768px) {
+            .dashboard { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                flex-direction: row;
+                padding: 0 10px;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                border-right: none;
+                border-top: 1px solid var(--border);
+            }
+            .logo-section { display: none; }
+            .nav-section { margin: 0; display: flex; flex: 1; justify-content: space-around; align-items: center; }
+            .nav-item { margin-bottom: 0; padding: 10px; }
+            
+            .main-content { padding-bottom: 80px; }
+            header { padding: 15px 20px; flex-direction: column; gap: 15px; align-items: flex-start; }
+            .profile-area { width: 100%; flex-direction: row-reverse; justify-content: space-between; }
+            .search-box { width: 100%; }
+            
+            .stats-row { grid-template-columns: 1fr; gap: 15px; }
+            .stat-value { font-size: 24px; }
+            
+            .login-glass { width: 90%; padding: 30px 20px; }
+            .login-glass h1 { font-size: 24px; }
+            
+            .panel-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .panel-header div { width: 100%; display: flex; gap: 10px; }
+            .btn-world { width: 100%; padding: 12px; font-size: 14px; }
+        }
+
+        /* 📱 ULTRA SMALL (Up to 480px) */
+        @media (max-width: 480px) {
+            .profile-area { flex-wrap: wrap; }
+            .admin-avatar { width: 35px; height: 35px; font-size: 14px; }
+        }
+
         /* CUSTOM SCROLLBAR */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -454,7 +507,7 @@
                     <div id="heroSequenceContainer" style="display:flex; gap:15px; overflow-x:auto; padding-bottom:15px; min-height:100px;">
                         <p style="opacity:0.3; font-size:12px; margin:auto;">No movies in the hero queue. Promote some below!</p>
                     </div>
-                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
                         <div class="stat-card">
                             <div class="stat-label">Hero Height</div>
                             <input id="cfgHeroHeight" placeholder="75vh">
@@ -466,6 +519,10 @@
                         <div class="stat-card">
                             <div class="stat-label">Override ID</div>
                             <input id="cfgHeroId" placeholder="YouTube ID (Master Overrule)">
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Rotation (ms)</div>
+                            <input id="cfgHeroDuration" placeholder="8000">
                         </div>
                     </div>
                 </div>
@@ -496,13 +553,14 @@
                         </div>
 
                         <textarea id="aiMovieDesc" placeholder="Cinematic description..." style="grid-column: span 2; height:100px;"></textarea>
-                        <div style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <input id="aiMovieYear" placeholder="Release Year (e.g. 2026)">
+                        <div style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                            <input id="aiMovieYear" placeholder="Release Year">
                             <select id="aiMovieType" style="width: 100%;">
                                 <option value="movie">Movie</option>
                                 <option value="tv">TV Show</option>
                                 <option value="sport">Sport</option>
                             </select>
+                            <input id="aiMovieHeroDuration" placeholder="Hero Duration (ms)" type="number">
                         </div>
                         <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:10px; border-radius:12px; border:1px solid var(--border); grid-column: span 2;">
                             <input type="checkbox" id="aiMovieIsHero" style="width:20px; height:20px; accent-color:var(--accent);">
@@ -677,6 +735,7 @@
             document.getElementById('cfgHeroId').value = cfg.heroOverrideId || "";
             document.getElementById('cfgHeroHeight').value = cfg.heroHeight || "75vh";
             document.getElementById('cfgHeroScale').value = cfg.heroScale || "120%";
+            document.getElementById('cfgHeroDuration').value = cfg.heroRotationDuration || "8000";
         }
 
         async function saveConfig(btn) {
@@ -687,7 +746,8 @@
             const config = {
                 heroOverrideId: document.getElementById('cfgHeroId').value.trim(),
                 heroHeight: document.getElementById('cfgHeroHeight').value.trim() || "75vh",
-                heroScale: document.getElementById('cfgHeroScale').value.trim() || "120%"
+                heroScale: document.getElementById('cfgHeroScale').value.trim() || "120%",
+                heroRotationDuration: parseInt(document.getElementById('cfgHeroDuration').value) || 8000
             };
 
             try {
@@ -763,6 +823,7 @@
             document.getElementById('aiMovieGenre').value = '';
             document.getElementById('aiMovieYear').value = '';
             document.getElementById('aiMovieType').value = 'movie';
+            document.getElementById('aiMovieHeroDuration').value = '';
             document.getElementById('aiMovieIsHero').checked = false;
             document.getElementById('aiMovieId').value = '';
             document.getElementById('creatorTitle').innerText = '🎥 Cinematic Content Creator';
@@ -791,6 +852,7 @@
             document.getElementById('aiMovieGenre').value = m.genre || '';
             document.getElementById('aiMovieYear').value = m.year || '';
             document.getElementById('aiMovieType').value = m.type || 'movie';
+            document.getElementById('aiMovieHeroDuration').value = m.heroDuration || '';
             document.getElementById('aiMovieIsHero').checked = m.isHero || false;
             document.getElementById('aiMovieId').value = m.id;
 
@@ -814,7 +876,8 @@
                 genre: document.getElementById('aiMovieGenre').value,
                 year: document.getElementById('aiMovieYear').value,
                 isHero: document.getElementById('aiMovieIsHero').checked,
-                type: document.getElementById('aiMovieType').value
+                type: document.getElementById('aiMovieType').value,
+                heroDuration: parseInt(document.getElementById('aiMovieHeroDuration').value) || undefined
             };
 
             // Removed old preserve logic as it's now in the form
@@ -906,6 +969,11 @@
                 <div class="stat-card" style="width:180px; flex-shrink:0; border-color:var(--accent); padding:15px; background:rgba(0,122,255,0.05);">
                     <img src="${m.img}" style="width:100%; height:100px; border-radius:10px; object-fit:cover; margin-bottom:10px;">
                     <div style="font-size:11px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.title}</div>
+                    <div style="font-size:9px; color:var(--text-muted); margin-top:4px;">Playtime (ms):</div>
+                    <input type="number" value="${m.heroDuration || 8000}" 
+                           onchange="updateMovieDuration(${m.id}, this.value)" 
+                           style="width:100%; font-size:10px; padding:4px; margin-top:2px; background:rgba(0,0,0,0.2); border:1px solid var(--border); color:white; border-radius:4px;" 
+                           placeholder="8000">
                     <div style="display:flex; gap:5px; margin-top:10px;">
                         <button onclick="moveHero(${m.id}, -1)" style="flex:1; background:var(--card); border:1px solid var(--border); color:white; border-radius:5px; cursor:pointer; font-size:10px; padding:5px;">◀</button>
                         <button onclick="moveHero(${m.id}, 1)" style="flex:1; background:var(--card); border:1px solid var(--border); color:white; border-radius:5px; cursor:pointer; font-size:10px; padding:5px;">▶</button>
@@ -930,6 +998,19 @@
             allData.movies[targetIdx] = temp;
             
             renderHeroSequence();
+        }
+
+        async function updateMovieDuration(id, duration) {
+            const m = allData.movies.find(x => x.id == id);
+            if(!m) return;
+            m.heroDuration = parseInt(duration) || 8000;
+            
+            // Sync with server
+            await fetch('/api/admin/movies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(m)
+            });
         }
 
         async function saveHeroSequence() {

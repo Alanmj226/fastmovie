@@ -588,6 +588,89 @@
 
         /* FAB REMOVED - AI MOVED TO SIDEBAR */
 
+        /* --- RESPONSIVE DESIGN (CSS MEDIA QUERIES) --- */
+
+        /* 🖥️ LARGE MONITORS (1440px+) */
+        @media (min-width: 1440px) {
+            .row-container { gap: 30px; }
+            .movie-card { min-width: 250px; }
+            .hero-title { font-size: 72px; }
+        }
+
+        /* 💻 LAPTOPS (1024px - 1439px) */
+        @media (max-width: 1200px) {
+            .search-bar { width: 300px; }
+            .hero-title { font-size: 48px; }
+        }
+
+        /* 📱 TABLETS (768px - 1023px) */
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 85px; }
+            .hero-info { left: 40px; bottom: 80px; }
+            .hero-title { font-size: 40px; }
+            .movie-card { min-width: 180px; }
+            .movie-card img { height: 260px; }
+            .row { padding-left: 30px; }
+            header { padding: 15px 30px; }
+        }
+
+        /* 📱 MOBILE (Up to 767px) */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                flex-direction: row;
+                justify-content: space-around;
+                border-radius: 20px 20px 0 0;
+                padding: 0 10px;
+                border-top: 1px solid var(--glass-border);
+            }
+            .sidebar:hover { width: 100%; }
+            .sidebar-logo { display: none; }
+            .nav-item { margin-bottom: 0; width: 50px; height: 50px; }
+            
+            .main-content { margin-left: 0; padding-bottom: 80px; }
+            
+            header { 
+                padding: 10px 20px;
+                position: fixed;
+                width: 100%;
+            }
+            .search-bar { display: none; } /* Hide search on mobile header to save space */
+            
+            .hero { height: 60vh; }
+            .hero-info { left: 20px; bottom: 50px; max-width: 90%; }
+            .hero-title { font-size: 28px; }
+            .hero-desc { font-size: 13px; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+            .hero-dots, .mute-btn { display: none; }
+            
+            .row { padding: 20px 0 0 20px; }
+            .row-container { gap: 12px; padding-bottom: 15px; }
+            .row-title { font-size: 16px; margin-bottom: 15px; }
+            .movie-card { min-width: 135px; border-radius: 12px; }
+            .movie-card img { height: 190px; }
+            .movie-info { padding: 12px 10px; }
+            .movie-name { font-size: 12px; }
+            
+            .auth-panel { width: 92%; padding: 25px 20px; border-radius: 24px; }
+            
+            .watch-page { padding: 15px; }
+            .player-wrap { height: 35vh; border-radius: 15px; margin-bottom: 20px; }
+            
+            .chat-box { width: 94%; right: 3%; bottom: 75px; height: 65vh; border-radius: 24px; }
+            .ai-fab { bottom: 75px; right: 15px; width: 60px; height: 60px; }
+        }
+
+        /* 📱 ULTRA SMALL DEVICES */
+        @media (max-width: 380px) {
+            .hero-title { font-size: 22px; }
+            .movie-card { min-width: 120px; }
+            .movie-card img { height: 170px; }
+        }
+
         /* AI NEURAL FAB */
         .ai-fab {
             position: fixed;
@@ -1715,6 +1798,7 @@
         let heroInterval;
         let isAdmin = false;
         let authMode = 'login';
+        let appConfig = { heroRotationDuration: 8000 };
 
         async function init() {
             try {
@@ -1731,6 +1815,7 @@
 
                     // Apply Global Config
                     if (cfg) {
+                        appConfig = { ...appConfig, ...cfg };
                         const heroRow = document.querySelector('.hero-row');
                         if (heroRow) heroRow.style.height = cfg.heroHeight || "75vh";
                         const heroVideo = document.getElementById('heroVideo');
@@ -1793,16 +1878,29 @@
 
         function startHeroRotation() {
             stopHeroRotation(); // Clear any existing
-            heroInterval = setInterval(() => {
+            
+            const scheduleNext = () => {
                 const trending = movies.filter(m => m.isHero === true);
                 if (!trending.length) return;
+                
                 currentHeroIndex = (currentHeroIndex + 1) % trending.length;
-                updateHero(trending[currentHeroIndex]);
-            }, 8000);
+                const nextMovie = trending[currentHeroIndex];
+                updateHero(nextMovie);
+                
+                const nextDuration = nextMovie.heroDuration || parseInt(appConfig.heroRotationDuration) || 8000;
+                heroInterval = setTimeout(scheduleNext, nextDuration);
+            };
+
+            const trending = movies.filter(m => m.isHero === true);
+            if (trending.length) {
+                const currentMovie = trending[currentHeroIndex];
+                const initialDuration = currentMovie.heroDuration || parseInt(appConfig.heroRotationDuration) || 8000;
+                heroInterval = setTimeout(scheduleNext, initialDuration);
+            }
         }
 
         function stopHeroRotation() {
-            if (heroInterval) clearInterval(heroInterval);
+            if (heroInterval) clearTimeout(heroInterval);
         }
 
         function getYoutubeId(url) {

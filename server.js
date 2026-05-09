@@ -32,7 +32,8 @@ if (fs.existsSync('movies.json')) {
 let config = {
     heroHeight: "75vh",
     heroScale: "120%",
-    heroOverrideId: ""
+    heroOverrideId: "",
+    heroRotationDuration: 8000
 };
 if (fs.existsSync('config.json')) {
     try { config = JSON.parse(fs.readFileSync('config.json')); } catch(e) {}
