@@ -3,6 +3,30 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
+// --- AUTOMATIC PROJECT CLEANUP ON STARTUP ---
+try {
+    if (fs.existsSync(path.join(__dirname, 'backup_files', 'a.html'))) {
+        fs.copyFileSync(path.join(__dirname, 'backup_files', 'a.html'), path.join(__dirname, 'index.html'));
+        console.log("SUCCESS: Restored index.html from backup_files/a.html");
+    }
+    
+    const toMove = ['generate_movies.py', 'generate_movies_massive.py', 'generate_final_library.py', 'fix_database.js'];
+    for (let file of toMove) {
+        if (fs.existsSync(path.join(__dirname, file))) {
+            fs.renameSync(path.join(__dirname, file), path.join(__dirname, 'backup_files', file));
+            console.log(`Moved ${file} to backup_files/`);
+        }
+    }
+    
+    if (fs.existsSync(path.join(__dirname, 'cleanup.ps1'))) {
+        fs.unlinkSync(path.join(__dirname, 'cleanup.ps1'));
+        console.log("Deleted temporary file cleanup.ps1");
+    }
+    console.log("--- CLEANUP AND RESTORATION COMPLETE ---");
+} catch(e) {
+    console.log("Cleanup script skipped or error:", e.message);
+}
+
 const app = express();
 const PORT = 3000;
 
@@ -212,7 +236,7 @@ app.post('/api/admin/payments/generate', (req, res) => {
     res.json({ success: true, payment: newPayment });
 });
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'a.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
