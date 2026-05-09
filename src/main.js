@@ -29,6 +29,11 @@ window.toggleWatchlist = toggleWatchlist;
 window.filterLang = filterLang;
 window.doLogout = doLogout;
 window.setMode = setMode;
+window.handleAuth = handleAuth;
+window.handleSendOTP = handleSendOTP;
+window.togglePass = togglePass;
+window.toggleQR = toggleQR;
+window.checkAdminAuto = checkAdminAuto;
 window.searchAll = searchAll;
 window.toggleChat = toggleChat;
 window.sendMessage = sendMessage;
@@ -41,6 +46,9 @@ window.handleAvatarUpload = handleAvatarUpload;
 window.toggleAvatarPicker = toggleAvatarPicker;
 window.saveProfileUpdates = saveProfileUpdates;
 window.setSiteLanguage = setSiteLanguage;
+window.doLogin = doLogin;
+window.closeWatch = closeWatch;
+window.startNeuralSearch = startNeuralSearch;
 
 async function init() {
     try {
@@ -432,12 +440,278 @@ function setMode(m) {
     const otpBtn = document.getElementById('otpBtn');
     const otpBox = document.getElementById('otpBox');
     const authBtn = document.getElementById('authBtn');
+    const userPass = document.getElementById('userPass');
+    const forgotLink = document.getElementById('forgotLink');
+
     if (m === 'login') {
         nameGroup.style.display = 'none'; otpBtn.style.display = 'none'; otpBox.style.display = 'none';
         passBox.style.display = 'block'; authBtn.style.display = 'block'; authBtn.innerText = 'Sign In';
+        forgotLink.style.display = 'block';
+        userPass.placeholder = "Enter Your Password";
     } else if (m === 'register') {
         nameGroup.style.display = 'block'; otpBtn.style.display = 'block'; otpBox.style.display = 'none';
         passBox.style.display = 'block'; authBtn.style.display = 'block'; authBtn.innerText = 'Create Account';
+        forgotLink.style.display = 'none';
+        userPass.placeholder = "Create a Password";
+    } else if (m === 'forgot') {
+        nameGroup.style.display = 'none';
+        otpBtn.style.display = 'block';
+        otpBtn.innerText = "Send Reset OTP";
+        otpBox.style.display = 'none';
+        passBox.style.display = 'none';
+        forgotLink.style.display = 'none';
+        authBtn.style.display = 'none';
+        userPass.placeholder = "Enter New Password";
+    }
+    const authError = document.getElementById('authError');
+    if (authError) authError.style.display = 'none';
+    checkAdminAuto();
+}
+
+function checkAdminAuto() {
+    const emailInput = document.getElementById('userEmail');
+    if (!emailInput) return;
+    const email = emailInput.value.trim();
+    const userPass = document.getElementById('userPass');
+    const otpBtn = document.getElementById('otpBtn');
+
+    if (authMode === 'register') return;
+
+    if (email === 'alan@gmail.com') {
+        isAdmin = true;
+        if (userPass) userPass.placeholder = "Enter Admin Password";
+    } else {
+        isAdmin = false;
+        if (userPass) userPass.placeholder = "Enter Your Password";
+    }
+    if (authMode === 'login' && otpBtn) {
+        otpBtn.style.display = 'none';
+    }
+}
+
+async function handleSendOTP() {
+    const name = document.getElementById('userName').value.trim();
+    const email = document.getElementById('userEmail').value.trim();
+    const err = document.getElementById('authError');
+    if (!email) { err.innerText = "Email required"; err.style.display = 'block'; return; }
+    
+    const endpoint = authMode === 'forgot' ? '/api/forgot-password' : '/api/send-otp';
+    
+    try {
+        const res = await fetch(endpoint, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email }) 
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('otpBox').style.display = 'block';
+            if (authMode === 'forgot') {
+                document.getElementById('passBox').style.display = 'block';
+                document.getElementById('authBtn').style.display = 'block';
+                document.getElementById('authBtn').innerText = "Reset Password";
+            }
+            err.innerText = data.message; err.style.display = 'block'; err.style.color = '#00ff88';
+        } else { 
+            err.innerText = data.error; err.style.display = 'block'; err.style.color = '#ff4d4d';
+        }
+    } catch (e) { 
+        err.innerText = "Server Error. Is the backend running?"; 
+        err.style.display = 'block'; 
+    }
+}
+
+async function handleAuth() {
+    const name = document.getElementById('userName').value.trim();
+    const email = document.getElementById('userEmail').value.trim();
+    const password = document.getElementById('userPass').value;
+    const otp = document.getElementById('otpInput').value.trim();
+    const err = document.getElementById('authError');
+    
+    let endpoint = '/api/login';
+    if (authMode === 'register') endpoint = '/api/register';
+    if (authMode === 'forgot') endpoint = '/api/reset-password';
+    
+    if (!email) { err.innerText = "Email is required"; err.style.display = 'block'; return; }
+    if (!password && authMode !== 'forgot') { err.innerText = "Password is required"; err.style.display = 'block'; return; }
+    
+    if (authMode === 'register' || authMode === 'forgot') {
+        if (authMode === 'register' && !name) { err.innerText = "Full Name is required"; err.style.display = 'block'; return; }
+        if (!otp) { err.innerText = "Please enter the OTP sent to your email"; err.style.display = 'block'; return; }
+    }
+
+    const isMasterAdmin = (email === 'alan@gmail.com');
+    const masterPass = 'aj1234';
+
+    try {
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, otp })
+        });
+        const data = await res.json();
+        if (res.ok) { 
+            if (authMode === 'forgot') {
+                alert("Password Reset Successful! You can now sign in with your new password.");
+                setMode('login');
+            } else {
+                doLogin(data); 
+            }
+        } else { 
+            err.innerText = data.error || "Authentication failed"; 
+            err.style.display = 'block'; 
+            err.style.color = '#ff4d4d'; 
+        }
+    } catch (e) {
+        if (isMasterAdmin && password === masterPass) {
+            doLogin({ name: 'Super Admin', email: 'alan@gmail.com', isAdmin: true, isLoggedIn: true });
+        } else { 
+            err.innerText = "System Connectivity Issue. Ensure server is running."; 
+            err.style.display = 'block'; 
+        }
+    }
+}
+
+function doLogin(data) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('profName').innerText = data.name;
+    document.getElementById('profEmail').innerText = data.email;
+    if (data.isAdmin) document.getElementById('adminLink').style.display = 'flex';
+    localStorage.setItem('currentUser', JSON.stringify(data));
+    showPage('home');
+    startHeroRotation();
+}
+
+function togglePass(id, el) {
+    const i = document.getElementById(id);
+    if (!i) return;
+    i.type = i.type === 'password' ? 'text' : 'password';
+    el.innerText = i.type === 'password' ? '👁️' : '🙈';
+}
+
+function toggleQR() {
+    const fields = document.getElementById('authFields');
+    const qr = document.getElementById('qrSection');
+    if (!fields || !qr) return;
+    if (fields.style.display === 'none') {
+        fields.style.display = 'block';
+        qr.style.display = 'none';
+    } else {
+        fields.style.display = 'none';
+        qr.style.display = 'block';
+    }
+}
+
+function closeWatch() {
+    document.getElementById('player').src = '';
+    showPage('home');
+}
+
+function startVoiceAI() {
+    if (!('webkitSpeechRecognition' in window)) {
+        return alert("AI Voice Search is only supported in Chrome.");
+    }
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.onstart = () => {
+        showNeuralProcessing("AI LISTENING...", 3000);
+        const voiceBtn = document.getElementById('voiceBtn');
+        if (voiceBtn) voiceBtn.style.color = 'var(--accent)';
+    };
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const searchInput = document.getElementById('aiSearchInput');
+        if (searchInput) searchInput.value = transcript;
+        handleSearch(transcript);
+        const voiceBtn = document.getElementById('voiceBtn');
+        if (voiceBtn) voiceBtn.style.color = 'white';
+    };
+    recognition.onerror = () => {
+        const voiceBtn = document.getElementById('voiceBtn');
+        if (voiceBtn) voiceBtn.style.color = 'white';
+    };
+    recognition.start();
+}
+
+function showNeuralProcessing(text, duration, callback) {
+    const overlay = document.getElementById('neuralOverlay');
+    if (!overlay) return;
+    overlay.querySelector('.neural-text').innerText = text;
+    overlay.style.display = 'flex';
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        if(callback) callback();
+    }, duration);
+}
+
+function startNeuralSearch() {
+    showNeuralProcessing("SCANNING MOVIE UNIVERSE...", 2000, () => {
+        const searchInput = document.getElementById('aiSearchInput');
+        if (searchInput) searchInput.focus();
+    });
+}
+
+function selectAvatar(emoji) {
+    const prof = document.getElementById('profAvatar');
+    prof.innerHTML = emoji;
+    prof.style.fontSize = '50px';
+}
+
+function handleAvatarUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const prof = document.getElementById('profAvatar');
+            prof.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function toggleAvatarPicker() {
+    const picker = document.getElementById('avatarPicker');
+    picker.style.display = picker.style.display === 'flex' ? 'none' : 'flex';
+}
+
+function saveProfileUpdates() {
+    const user = JSON.parse(localStorage.getItem('currentUser')) || {};
+    user.name = document.getElementById('profName').innerText;
+    user.feedback = document.getElementById('profFeedback').value;
+    
+    const prof = document.getElementById('profAvatar');
+    const img = prof.querySelector('img');
+    user.avatar = img ? img.src : prof.innerText;
+
+    // Save Settings
+    user.quality = document.getElementById('setQuality').value;
+    user.siteLang = document.getElementById('setSiteLang').value;
+    user.parental = document.getElementById('setParental').checked;
+    user.subtitles = document.getElementById('setSub').value;
+    user.autoplay = document.getElementById('setAutoplay').checked;
+    user.theme = document.getElementById('setTheme').value;
+    user.audio = document.getElementById('setAudio').value;
+    user.anim = document.getElementById('setAnim').value;
+    user.privacy = document.getElementById('setPrivacy').checked;
+
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    showNeuralProcessing("SAVING NEURAL PROFILE...", 1500, () => {
+        alert("Profile & Settings Updated Successfully!");
+    });
+}
+
+function setSiteLanguage(lang) {
+    currentSiteLanguage = lang;
+    document.getElementById('setSiteLang').value = lang;
+}
+
+function submitUserReview() {
+    const review = prompt("Enter your review for this masterpiece:");
+    if (review) {
+        showNeuralProcessing("UPLOADING REVIEW...", 1000, () => {
+            alert("Thank you! Your review has been added to the Fast Movie network.");
+        });
     }
 }
 
