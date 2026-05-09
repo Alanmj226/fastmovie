@@ -170,7 +170,7 @@ class SmartHandler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({"heroHeight":"75vh", "heroScale":"120%", "heroOverrideId":""})
 
         if clean_path in ['/admin', '/admin.html']: self.path = '/admin.html'
-        elif clean_path in ['/', '', '/home']: self.path = '/a.html'
+        elif clean_path in ['/', '', '/home']: self.path = '/index.html'
         
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
