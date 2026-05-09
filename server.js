@@ -128,16 +128,21 @@ app.post(['/api/login', '/api/register'], (req, res) => {
 app.get('/api/admin/users', (req, res) => res.json(Object.values(users)));
 
 app.post('/api/admin/movies', (req, res) => {
-    const movie = req.body;
-    const index = movies.findIndex(m => m.id === movie.id);
-    if (index !== -1) {
-        movies[index] = movie;
+    const data = req.body;
+    if (Array.isArray(data)) {
+        movies = data;
     } else {
-        movie.id = movies.length > 0 ? Math.max(...movies.map(m => m.id)) + 1 : 1;
-        movies.push(movie);
+        const movie = data;
+        const index = movies.findIndex(m => m.id === movie.id);
+        if (index !== -1) {
+            movies[index] = movie;
+        } else {
+            movie.id = movies.length > 0 ? Math.max(...movies.filter(m => m.id).map(m => m.id)) + 1 : 1;
+            movies.push(movie);
+        }
     }
     fs.writeFileSync('movies.json', JSON.stringify(movies, null, 2));
-    res.json({ success: true, movie });
+    res.json({ success: true, moviesCount: movies.length });
 });
 
 app.delete('/api/admin/movies/:id', (req, res) => {
