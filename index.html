@@ -1000,6 +1000,29 @@
             50% { transform: scale(1.05); box-shadow: 0 0 60px var(--accent-glow); }
             100% { transform: scale(1); box-shadow: 0 0 30px var(--accent-glow); }
         }
+        /* SKELETON LOADING */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 25%, rgba(255,255,255,0.05) 50%, var(--surface) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* PREMIUM PLACEHOLDERS */
+        .poster-placeholder {
+            width: 100%; height: 100%;
+            background: var(--surface);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 10px; font-weight: 800;
+            text-align: center; padding: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
         /* NEURAL ENGINE OVERLAY */
         #neuralOverlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
@@ -1826,15 +1849,23 @@
 
         async function init() {
             try {
-                const [moviesRes, configRes] = await Promise.all([
-                    fetch(`/api/movies?t=${Date.now()}`),
-                    fetch(`/api/config?t=${Date.now()}`)
-                ]);
-                const data = await moviesRes.json();
-                const cfg = await configRes.json();
+                let data = [];
+                let cfg = null;
+
+                try {
+                    const moviesRes = await fetch(`/api/movies?t=${Date.now()}`);
+                    if (moviesRes.ok) data = await moviesRes.json();
+                } catch(err) { console.warn("Movies API unreachable"); }
+
+                try {
+                    const configRes = await fetch(`/api/config?t=${Date.now()}`);
+                    if (configRes.ok) cfg = await configRes.json();
+                } catch(err) { console.warn("Config API unreachable"); }
                 
                 if (data && data.length > 0) {
                     movies = data;
+                } else {
+                    movies = [...FALLBACK_DATABASE];
                 }
 
                     // Apply Global Config
@@ -1849,12 +1880,14 @@
                         }
                         
                         if (cfg.heroOverrideId) {
-                            let overrideMovie = movies.find(m => getYoutubeId(m.video) === cfg.heroOverrideId);
+                            const cleanOverrideId = getYoutubeId(cfg.heroOverrideId);
+                            let overrideMovie = movies.find(m => getYoutubeId(m.video) === cleanOverrideId);
+                            
                             if (!overrideMovie) {
                                 overrideMovie = {
-                                    title: "ADMIN CHOICE",
-                                    description: "This content has been promoted by the Master Admin.",
-                                    video: cfg.heroOverrideId,
+                                    title: "FEATURED PREMIERE",
+                                    description: "This premium content has been hand-selected by the Master Admin for its cinematic excellence.",
+                                    video: cleanOverrideId,
                                     isHero: true,
                                     id: 9999
                                 };
@@ -2112,10 +2145,14 @@
 
             return `
                 <div class="movie-card" onclick="openWatch(${m.id})">
-                    <img src="${imgUrl}" 
-                         onload="if(this.naturalWidth==120) { this.src = this.src.includes('maxresdefault') ? this.src.replace('maxresdefault', 'hqdefault') : '${uniquePlaceholder}'; }"
-                         onerror="if(this.src.includes('maxresdefault')) { this.src = this.src.replace('maxresdefault', 'hqdefault'); } else { this.src='${uniquePlaceholder}'; }">
-                    
+                    <div class="poster-wrap" style="width:100%; height:100%; position:relative;">
+                        <img src="${imgUrl.includes('maxresdefault') ? imgUrl.replace('maxresdefault', 'hqdefault') : imgUrl}" 
+                             class="movie-poster"
+                             loading="lazy"
+                             onload="this.style.opacity='1'"
+                             style="opacity:0; transition: opacity 0.5s;"
+                             onerror="this.parentElement.innerHTML = '<div class=\'poster-placeholder\'><div>🎬</div><div style=\'margin-top:10px\'>${m.title.toUpperCase()}</div><div style=\'font-size:8px; opacity:0.5; margin-top:5px\'>POSTER NOT FOUND</div></div>'">
+                    </div>                    
                     ${isNew ? '<div style="position:absolute; top:15px; left:15px; background:var(--accent-gradient); padding:4px 12px; border-radius:10px; font-size:10px; font-weight:900; z-index:10; box-shadow:0 0 15px var(--accent-glow); border: 1px solid rgba(255,255,255,0.2);">NEW 2024</div>' : ''}
                     
                     <div class="movie-info">
@@ -2165,17 +2202,41 @@
             const title = type === 'movie' ? 'Blockbuster Movies' : type === 'tv' ? 'Must-Watch Series' : 'Live Sports & Highlights';
 
             const row = document.createElement('div');
-            row.className = 'row';
+            row.className = 'row skeleton-row'; // Start as skeleton
+            row.style.minHeight = '300px';
             row.innerHTML = `
-                <div class="row-title">
-                    <div style="width:4px; height:24px; background:var(--accent); border-radius:4px; box-shadow:0 0 15px var(--accent);"></div>
-                    ${title}
-                </div>
+                <div class="row-title" style="opacity:0.3;">Loading...</div>
                 <div class="row-container">
-                    ${filtered.map(m => createMovieCard(m)).join('')}
+                    <div class="movie-card skeleton" style="height:250px;"></div>
+                    <div class="movie-card skeleton" style="height:250px;"></div>
+                    <div class="movie-card skeleton" style="height:250px;"></div>
+                    <div class="movie-card skeleton" style="height:250px;"></div>
                 </div>
             `;
+
             container.appendChild(row);
+
+            // AI VIEWPORT OPTIMIZER: Only render content when visible
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        row.className = 'row';
+                        row.style.minHeight = 'auto';
+                        row.innerHTML = `
+                            <div class="row-title">
+                                <div style="width:4px; height:24px; background:var(--accent); border-radius:4px; box-shadow:0 0 15px var(--accent);"></div>
+                                ${title}
+                            </div>
+                            <div class="row-container">
+                                ${filtered.map(m => createMovieCard(m)).join('')}
+                            </div>
+                        `;
+                        observer.unobserve(row);
+                    }
+                });
+            }, { rootMargin: '100px' });
+
+            observer.observe(row);
         }
 
         function renderContinueWatching() {
@@ -2329,8 +2390,20 @@
                     );
                 } finally {
                     if(loader) loader.style.display = 'none';
-                    queryLabel.innerText = results.length > 0 ? `Found ${results.length} results for "${q}"` : `No matches found for "${q}".`;
-                    container.innerHTML = results.map(m => createMovieCard(m)).join('');
+                    if (results.length > 0) {
+                        queryLabel.innerText = `Found ${results.length} results for "${q}"`;
+                        container.innerHTML = results.map(m => createMovieCard(m)).join('');
+                    } else {
+                        queryLabel.innerText = "";
+                        container.innerHTML = `
+                            <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; background: var(--glass); border-radius: 32px; border: 1px solid var(--glass-border);">
+                                <div style="font-size: 64px; margin-bottom: 20px; opacity: 0.5;">🔍</div>
+                                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 10px;">No matches found for "${q}"</h2>
+                                <p style="color: var(--text-muted); font-size: 14px; max-width: 300px; margin: 0 auto;">Try checking your spelling or search for another movie, genre, or actor.</p>
+                                <button onclick="handleSearch('')" style="margin-top: 30px; background: var(--accent); border: none; color: white; padding: 12px 30px; border-radius: 12px; font-weight: 800; cursor: pointer;">View Trending Content</button>
+                            </div>
+                        `;
+                    }
                 }
             }, 400); 
         }
@@ -2340,7 +2413,13 @@
             if (input) input.value = q;
             handleSearch(q);
         }
+        let lastHomeScroll = 0;
         function showPage(pageId) {
+            const currentPage = Array.from(document.querySelectorAll('.page')).find(p => p.style.display !== 'none');
+            if (currentPage && currentPage.id === 'homePage') {
+                lastHomeScroll = window.scrollY;
+            }
+
             // Hide all pages
             document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
             
@@ -2356,6 +2435,14 @@
 
             const target = document.getElementById(targetId);
             if (target) {
+                target.style.display = 'block';
+                if (pageId === 'home') {
+                    window.scrollTo({ top: lastHomeScroll, behavior: 'instant' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                }
+            }
+        }
                 target.style.display = 'block';
                 
                 // LOAD PROFILE DATA IF NEEDED

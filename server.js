@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -15,9 +16,9 @@ app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html'))
 
 app.use(express.static(__dirname));
 
-const ADMIN_EMAIL = "admin@fastmovie.com";
-const SUPER_ADMIN_EMAIL = "alan@gmail.com";
-const ADMIN_PASS = "aj1234";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@fastmovie.com";
+const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL || "alan@gmail.com";
+const ADMIN_PASS = process.env.ADMIN_PASS || "aj1234";
 
 let users = {};
 if (fs.existsSync('users.json')) {

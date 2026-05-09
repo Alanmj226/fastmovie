@@ -767,13 +767,24 @@
             document.getElementById('cfgHeroAuto').checked = cfg.heroAutoRotation !== false;
         }
 
+        function getYoutubeId(url) {
+            if (!url) return '';
+            if (url.length === 11) return url;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : url;
+        }
+
         async function saveConfig(btn) {
             const originalText = btn.innerText;
             btn.innerText = "Applying...";
             btn.disabled = true;
 
+            const overrideVal = document.getElementById('cfgHeroId').value.trim();
+            const cleanOverrideId = getYoutubeId(overrideVal);
+
             const config = {
-                heroOverrideId: document.getElementById('cfgHeroId').value.trim(),
+                heroOverrideId: cleanOverrideId,
                 heroHeight: document.getElementById('cfgHeroHeight').value.trim() || "75vh",
                 heroScale: document.getElementById('cfgHeroScale').value.trim() || "120%",
                 heroRotationDuration: parseInt(document.getElementById('cfgHeroDuration').value) || 8000,

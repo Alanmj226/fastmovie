@@ -17,8 +17,8 @@ MOVIES_FILE = os.path.join(BASE_DIR, 'movies.json')
 OTP_EXPIRY_MINUTES = 5
 
 # Admin Credentials
-SUPER_ADMIN_EMAIL = "alan@gmail.com"
-ADMIN_PASS  = "aj1234"
+SUPER_ADMIN_EMAIL = os.environ.get("SUPER_ADMIN_EMAIL", "alan@gmail.com")
+ADMIN_PASS  = os.environ.get("ADMIN_PASS", "aj1234")
 
 # --- SMART UTILS ---
 def find_available_port(start_port):
