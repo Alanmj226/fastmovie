@@ -7,7 +7,9 @@
     <title>Fast Movie - Premium Streaming</title>
     <link rel="icon" type="image/png" href="/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
+    <link rel="stylesheet" href="/src/index.css">
+    <!-- Removed inline styles -->
+    <style style="display:none;">
         :root {
             --bg: #04070d;
             --surface: #0a1120;
@@ -1698,7 +1700,9 @@
         </div>
     </div>
 
-    <script>
+    <script type="module" src="/src/main.js"></script>
+    <!-- Removed inline scripts -->
+    <script style="display:none;">
         const FALLBACK_DATABASE = [
             { id: 1, title: "John Wick: Chapter 4", genre: "Action", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "John Wick uncovers a path to defeating The High Table.", isHero: true },
             { id: 45, title: "Panchayat", genre: "Comedy", lang: "Hindi", year: "2024", type: "tv", img: "https://img.youtube.com/vi/9XInQJRqGW4/hqdefault.jpg", video: "9XInQJRqGW4", description: "An engineer takes a job in a remote village.", isHero: true },
