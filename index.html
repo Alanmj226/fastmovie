@@ -614,54 +614,78 @@
             header { padding: 15px 30px; }
         }
 
-        /* 📱 MOBILE (Up to 767px) */
+        /* 📱 MOBILE (Up to 767px) - PREMIUM REDESIGN */
         @media (max-width: 768px) {
             .sidebar {
-                width: 100%;
-                height: 60px;
+                width: 92%;
+                height: 65px;
                 top: auto;
-                bottom: 0;
-                left: 0;
+                bottom: 20px;
+                left: 4%;
                 flex-direction: row;
                 justify-content: space-around;
-                border-radius: 20px 20px 0 0;
-                padding: 0 10px;
-                border-top: 1px solid var(--glass-border);
+                border-radius: 25px;
+                padding: 0 15px;
+                background: rgba(11, 15, 26, 0.85);
+                backdrop-filter: blur(30px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+                z-index: 1000;
             }
-            .sidebar:hover { width: 100%; }
+            .sidebar:hover { width: 92%; }
             .sidebar-logo { display: none; }
-            .nav-item { margin-bottom: 0; width: 50px; height: 50px; }
+            .nav-item { 
+                margin-bottom: 0; 
+                width: auto; 
+                height: 100%; 
+                flex: 1;
+                flex-direction: column;
+                gap: 4px;
+                border-radius: 15px;
+                font-size: 10px;
+                color: var(--text-muted);
+            }
+            .nav-item span { display: block; font-size: 10px; font-weight: 700; }
+            .nav-item.active { background: transparent; box-shadow: none; color: var(--accent); }
+            .nav-item.active .nav-icon { filter: drop-shadow(0 0 10px var(--accent)); }
             
-            .main-content { margin-left: 0; padding-bottom: 80px; }
+            .main-content { margin-left: 0; padding-bottom: 110px; }
             
             header { 
-                padding: 10px 20px;
+                padding: 15px 20px;
                 position: fixed;
                 width: 100%;
+                background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+                backdrop-filter: none;
+                border-bottom: none;
             }
-            .search-bar { display: none; } /* Hide search on mobile header to save space */
+            .search-bar { display: none; }
             
-            .hero { height: 60vh; }
-            .hero-info { left: 20px; bottom: 50px; max-width: 90%; }
-            .hero-title { font-size: 28px; }
-            .hero-desc { font-size: 13px; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
-            .hero-dots, .mute-btn { display: none; }
+            .hero { height: 65vh; border-radius: 0 0 40px 40px; margin-bottom: 10px; }
+            .hero-overlay { background: linear-gradient(to top, var(--bg) 0%, transparent 40%); }
+            .hero-info { left: 20px; bottom: 40px; max-width: 90%; }
+            .hero-title { font-size: 32px; letter-spacing: -1px; }
+            .hero-desc { font-size: 13px; -webkit-line-clamp: 2; line-height: 1.4; opacity: 0.8; }
+            .hero-btns .btn-primary { padding: 12px 25px; font-size: 14px; }
             
-            .row { padding: 20px 0 0 20px; }
-            .row-container { gap: 12px; padding-bottom: 15px; }
-            .row-title { font-size: 16px; margin-bottom: 15px; }
-            .movie-card { min-width: 135px; border-radius: 12px; }
-            .movie-card img { height: 190px; }
-            .movie-info { padding: 12px 10px; }
-            .movie-name { font-size: 12px; }
+            .row { padding: 25px 0 0 20px; }
+            .row-container { gap: 15px; padding-bottom: 10px; }
+            .row-title { font-size: 18px; font-weight: 800; }
             
-            .auth-panel { width: 92%; padding: 25px 20px; border-radius: 24px; }
+            .movie-card { min-width: 145px; border-radius: 18px; }
+            .movie-card img { height: 210px; }
+            .movie-info { padding: 15px 12px; opacity: 1; transform: translateY(0); background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+            .movie-name { font-size: 13px; }
             
-            .watch-page { padding: 15px; }
-            .player-wrap { height: 35vh; border-radius: 15px; margin-bottom: 20px; }
+            .auth-panel { width: 92%; padding: 35px 25px; border-radius: 40px; }
+            .login-box h2 { font-size: 28px; }
             
-            .chat-box { width: 94%; right: 3%; bottom: 75px; height: 65vh; border-radius: 24px; }
-            .ai-fab { bottom: 75px; right: 15px; width: 60px; height: 60px; }
+            .watch-page { padding: 0; }
+            .player-wrap { height: 35vh; border-radius: 0; margin-bottom: 20px; }
+            .watch-info { padding: 20px; }
+            
+            .chat-box { width: 94%; right: 3%; bottom: 100px; height: 70vh; border-radius: 35px; }
+            .ai-fab { bottom: 100px; right: 20px; width: 60px; height: 60px; box-shadow: 0 10px 30px var(--accent-glow); }
         }
 
         /* 📱 ULTRA SMALL DEVICES */
@@ -1678,7 +1702,7 @@
             { id: 64, title: "Smile 2", genre: "Horror", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/03Z93uMcSIs/hqdefault.jpg", video: "03Z93uMcSIs", description: "A pop star experiences terrifying events." },
             { id: 65, title: "Evil Dead Rise", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/BqQMCUIIdwk/hqdefault.jpg", video: "BqQMCUIIdwk", description: "Flesh-possessing demons push a family to the brink." },
             { id: 66, title: "Talk to Me", genre: "Horror", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/aLAKJu9aJys/hqdefault.jpg", video: "aLAKJu9aJys", description: "Friends conjure spirits using an embalmed hand." },
-            { id: 67, title: "Stranger Things", genre: "Horror", lang: "English", year: "2024", type: "tv", img: "https://img.youtube.com/vi/b9EkMc79ZSU/hqdefault.jpg", video: "b9EkMc79ZSU", description: "Kids in Hawkins face the Upside Down.", isHero: true },
+            { id: 67, title: "Stranger Things", genre: "Horror", lang: "English", year: "2024", type: "tv", img: "https://img.youtube.com/vi/b9EkMc79ZSU/hqdefault.jpg", video: "b9EkMc79ZSU", description: "Kids in Hawkins face the Upside Down.", isHero: false },
             { id: 68, title: "Barbarian", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/Dr89pm7kvM0/hqdefault.jpg", video: "Dr89pm7kvM0", description: "A young woman finds her rental home is double-booked." },
             { id: 69, title: "M3GAN", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/BRb4U99OU80/hqdefault.jpg", video: "BRb4U99OU80", description: "A realistic doll is programmed to be a child's companion." },
             { id: 70, title: "Pearl", genre: "Horror", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/L5PW5Ge3YwE/hqdefault.jpg", video: "L5PW5Ge3YwE", description: "The origin story of the villain from X." },
@@ -1698,7 +1722,7 @@
             { id: 84, title: "The Conjuring", genre: "Horror", lang: "English", year: "2013", type: "movie", img: "https://img.youtube.com/vi/k10ETZ41q5o/hqdefault.jpg", video: "k10ETZ41q5o", description: "Paranormal investigators help a terrorized family." },
 
             // SCI-FI (21 items)
-            { id: 85, title: "Dune: Part Two", genre: "Sci-Fi", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/Way9Dexny3w/hqdefault.jpg", video: "Way9Dexny3w", description: "Paul Atreides unites with the Fremen.", isHero: true },
+            { id: 85, title: "Dune: Part Two", genre: "Sci-Fi", lang: "English", year: "2024", type: "movie", img: "https://img.youtube.com/vi/Way9Dexny3w/hqdefault.jpg", video: "Way9Dexny3w", description: "Paul Atreides unites with the Fremen.", isHero: false },
             { id: 86, title: "Everything Everywhere", genre: "Sci-Fi", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/wxN1T1uxQ2g/hqdefault.jpg", video: "wxN1T1uxQ2g", description: "An aging immigrant is swept up in an adventure." },
             { id: 87, title: "Avatar: Way of Water", genre: "Sci-Fi", lang: "English", year: "2022", type: "movie", img: "https://img.youtube.com/vi/d9MyW72ELq0/hqdefault.jpg", video: "d9MyW72ELq0", description: "Jake Sully protects his family on Pandora." },
             { id: 88, title: "The Creator", genre: "Sci-Fi", lang: "English", year: "2023", type: "movie", img: "https://img.youtube.com/vi/ex3C1WnN96S/hqdefault.jpg", video: "ex3C1WnN96S", description: "A future war between humans and AI." },
@@ -1725,7 +1749,7 @@
             { id: 107, title: "Demon Slayer", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/vY8p0u0T3nU/hqdefault.jpg", video: "vY8p0u0T3nU", description: "A boy becomes a demon slayer after his family is killed." },
             { id: 108, title: "Attack on Titan", genre: "Anime", lang: "Japanese", year: "2023", type: "tv", img: "https://img.youtube.com/vi/MGRm4IzK1SQ/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "Humanity fights for survival against giants." },
             { id: 109, title: "One Piece", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "Luffy and his crew explore a fantastical world." },
-            { id: 110, title: "Blue Lock", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/yU6Yv_K6vsw/hqdefault.jpg", video: "yU6Yv_K6vsw", description: "Japan's strikers compete in a training facility.", isHero: true },
+            { id: 110, title: "Blue Lock", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/yU6Yv_K6vsw/hqdefault.jpg", video: "yU6Yv_K6vsw", description: "Japan's strikers compete in a training facility.", isHero: false },
             { id: 111, title: "Chainsaw Man", genre: "Anime", lang: "Japanese", year: "2022", type: "tv", img: "https://img.youtube.com/vi/v4yv6S9y/hqdefault.jpg", video: "v4yv6S9y", description: "A young man merges with his pet devil." },
             { id: 112, title: "Spy x Family", genre: "Anime", lang: "Japanese", year: "2023", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "A fake family for a secret mission." },
             { id: 113, title: "Suzume", genre: "Anime", lang: "Japanese", year: "2022", type: "movie", img: "https://img.youtube.com/vi/6Ei9O9yPZJz8/hqdefault.jpg", video: "6Ei9O9yPZJz8", description: "A girl helps a man close doors from the other side." },
@@ -1744,7 +1768,7 @@
             { id: 126, title: "Bleach: TYBW", genre: "Anime", lang: "Japanese", year: "2024", type: "tv", img: "https://img.youtube.com/vi/S3S9y/hqdefault.jpg", video: "MGRm4IzK1SQ", description: "The final battle of the Soul Society." },
 
             // CRICKET (21 items)
-            { id: 127, title: "IPL 2024 Highlights", genre: "Cricket", lang: "Hindi", year: "2024", type: "sport", img: "https://img.youtube.com/vi/Po3jG2vM1S4/hqdefault.jpg", video: "Po3jG2vM1S4", description: "The best moments from IPL 2024.", isHero: true },
+            { id: 127, title: "IPL 2024 Highlights", genre: "Cricket", lang: "Hindi", year: "2024", type: "sport", img: "https://img.youtube.com/vi/Po3jG2vM1S4/hqdefault.jpg", video: "Po3jG2vM1S4", description: "The best moments from IPL 2024.", isHero: false },
             { id: 128, title: "T20 World Cup 2024", genre: "Cricket", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/Yf3P66S9S9y/hqdefault.jpg", video: "Yf3P66S9S9y", description: "Highlights from the ICC T20 World Cup." },
             { id: 129, title: "Asia Cup 2023", genre: "Cricket", lang: "Hindi", year: "2023", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Classic matches from the Asia Cup." },
             { id: 130, title: "CWC 2023 Final", genre: "Cricket", lang: "English", year: "2023", type: "sport", img: "https://img.youtube.com/vi/fJRZ_fS3S9y/hqdefault.jpg", video: "fJRZ_fS3S9y", description: "India vs Australia World Cup final." },
@@ -1767,7 +1791,7 @@
             { id: 147, title: "The Hundred", genre: "Cricket", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "100-ball cricket highlights." },
 
             // FOOTBALL (21 items)
-            { id: 148, title: "UCL Final 2024", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/S-E01mS7G8k/hqdefault.jpg", video: "S-E01mS7G8k", description: "Real Madrid vs Dortmund.", isHero: true },
+            { id: 148, title: "UCL Final 2024", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/S-E01mS7G8k/hqdefault.jpg", video: "S-E01mS7G8k", description: "Real Madrid vs Dortmund.", isHero: false },
             { id: 149, title: "Euro 2024 Final", genre: "Football", lang: "Global", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Spain vs England final." },
             { id: 150, title: "Copa America", genre: "Football", lang: "Spanish", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Argentina vs Colombia." },
             { id: 151, title: "Premier League", genre: "Football", lang: "English", year: "2024", type: "sport", img: "https://img.youtube.com/vi/qEVUtrk8_B4/hqdefault.jpg", video: "qEVUtrk8_B4", description: "Top goals of the season." },
@@ -1921,7 +1945,7 @@
         }
 
         function updateHero(m) {
-            if (!m) return;
+            if (!m || (m.id !== 9999 && !m.isHero)) return; // Strict permission check
             const heroTitle = document.getElementById('heroTitle');
             const heroDesc = document.getElementById('heroDesc');
             const heroVideo = document.getElementById('heroVideo');
